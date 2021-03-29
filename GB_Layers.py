@@ -11,5 +11,4 @@ class MM_Layer(keras.layers.Layer):
 
     def call(self, inputs):
         multplied_ew = tf.multiply(inputs[:,:,:1], inputs[:,:,1:2])
-        print(multplied_ew)
-        return tf.multiply(tf.exp(multplied_ew), self.alpha)
+        return 1 / tf.multiply(tf.exp(multplied_ew), self.alpha)
