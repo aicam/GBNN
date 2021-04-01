@@ -1,0 +1,6 @@
+source leaprc.protein.ff14SB
+set default PBRadii mbondi
+set default PdbWriteCharges on
+fake = loadpdb fake.pdb
+savePdb fake fake_o.pdb
+quit
