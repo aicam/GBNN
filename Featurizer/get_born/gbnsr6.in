@@ -1,0 +1,8 @@
+compute
+&cntrl
+inp=1
+/
+&gb
+epsin=1.0, epsout=78.5, istrng=0, dprob=1.4, space=0.5,
+arcres=0.2, B=0.028, alpb=1, rbornstat=1, cavity_surften=0.005
+/
