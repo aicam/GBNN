@@ -20,7 +20,7 @@ def get_R_matrix(coors, M):
     i = tf.constant(0)
     c = lambda i, R, coors: tf.less(i, coors.get_shape()[0])
     # print( tf.reshape(tf.cast(tf.sort(AtomDistance(coors[i], coors)[:M]), dtype=tf.float32), [1, M]))
-    b = lambda i, R, coors: (i + 1, tf.concat([R, tf.reshape(tf.cast(tf.sort(AtomDistance(coors[i], coors)[:M]), dtype=tf.float32), [1, M])], axis=0), coors)
+    b = lambda i, R, coors: (i + 1, tf.concat([R, tf.reshape(tf.cast(tf.sort(AtomDistance(coors[i], coors))[1:M + 1], dtype=tf.float32), [1, M])], axis=0), coors)
     def body(i):
         # R[i].assign(tf.cast(tf.sort(AtomDistance(coors[i], coors)[:M]), dtype=tf.float32))
         return i
@@ -30,4 +30,5 @@ def get_R_matrix(coors, M):
 
 
 a = get_R_matrix(get_atoms('/home/ali/calstate/amber/ras-raf.pdb'), 12)
-print(a[1])
+print(a[1][3112])
+
