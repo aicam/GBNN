@@ -35,5 +35,5 @@ def R_wrapper(coors, M):
     return R_matrix[1], R_matrix[2]
 
 
-a = R_wrapper(get_atoms('/home/ali/calstate/amber/ras-raf.pdb'), 12)
-print(a)
+# a = R_wrapper(get_atoms('/home/ali/calstate/amber/ras-raf.pdb'), 12)
+# print(a)
