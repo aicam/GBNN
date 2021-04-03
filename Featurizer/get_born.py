@@ -1,6 +1,5 @@
 import subprocess
 import os
-from biopandas.pdb import PandasPdb
 
 
 
@@ -14,10 +13,15 @@ def get_born(pdbfile):
                               stderr=subprocess.PIPE)
     while (result.stdout.decode("utf-8") == ""):
         continue
-    pandaspdb = PandasPdb()
     print(result.stdout.decode("utf-8"))
-    # TODO: add gbnsr6 parser
+    # TODO: Ask prof, rinv is consistent?
+    lines = result.stdout.decode("utf-8").split("\n")
+    B = []
+    for l in lines:
+        if l[:4] != "rinv":
+            continue
+        B.append(float(list(filter(None, l.split(' ')))[2].replace('\n', '')))
     # ppdb_df = pandaspdb.read_pdb_from_list(pdb_lines=result.stdout.decode("utf-8").split("\n"))
     # return ppdb_df.df['ATOM']
-
+    return B
 print(get_born("~/calstate/amber/ras.pdb"))
