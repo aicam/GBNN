@@ -4,8 +4,6 @@ from biopandas.pdb import PandasPdb
 '''
  Get atom coordinates from pdb file
 '''
-
-
 def get_atoms(pdbfile):
     pdbfile = '/'.join(pdbfile.split('/')[1:])
     pdb = PandasPdb().read_pdb(pdbfile)
@@ -16,8 +14,6 @@ def get_atoms(pdbfile):
 '''
  Distance function for atoms
 '''
-
-
 @tf.function
 def AtomDistance(x, y):
     return tf.sqrt(tf.reduce_sum(tf.square(x - y), 1))
@@ -27,8 +23,6 @@ def AtomDistance(x, y):
  This function has been added to cover R and R_id variables 
  out of exact function to be changed in each iteration
 '''
-
-
 def R_wrapper(coors, M):
     R = tf.reshape(tf.Variable([.1 for i in range(M)], dtype=tf.float32), shape=[1, M])
     R_id = tf.reshape(tf.Variable([1 for i in range(M)], dtype=tf.int32), shape=[1, M])
