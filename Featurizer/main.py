@@ -4,6 +4,9 @@ from Featurizer.get_radius import *
 import pandas as pd
 import numpy as np
 
+'''
+ Experimental function to imitate born radii
+'''
 def fake_born(fake_file):
     f = open(fake_file)
     B = []
@@ -13,6 +16,9 @@ def fake_born(fake_file):
         B.append(float(list(filter(None, l.split(' ')))[2].replace('\n', '')))
     return B
 
+'''
+ Use all feature extractor functions to generate dataframe 
+'''
 def get_pdb_dataframe(pdbfile):
     C = np.array(get_pdb_charges(pdbfile))
     # B = np.array(get_pdb_born(pdbfile))
@@ -25,7 +31,8 @@ def get_pdb_dataframe(pdbfile):
     df = pd.DataFrame({k : pd.Series(v.reshape([-1])) for k, v in df_dict.items()})
     return df
 
-def transform_matrices(C, B, R, R_id):
-    C_neighbors = np.zeros([len(C), R.shape[1]])
-    B_neighbors = np.zeros([len(B)])
-# get_pdb_dataframe('/home/ali/calstate/amber/','ras-raf.pdb')
+# TODO: complete this function
+# def transform_matrices(C, B, R, R_id):
+#     C_neighbors = np.zeros([len(C), R.shape[1]])
+#     B_neighbors = np.zeros([len(B)])
+
