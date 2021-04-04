@@ -13,20 +13,19 @@ def fake_born(fake_file):
         B.append(float(list(filter(None, l.split(' ')))[2].replace('\n', '')))
     return B
 
-def get_pdb_dataframe(path, pdbfile):
-    full_path_pdb = path + pdbfile
-    C = np.array(get_pdb_charges(full_path_pdb))
+def get_pdb_dataframe(pdbfile):
+    C = np.array(get_pdb_charges(pdbfile))
+    # B = np.array(get_pdb_born(pdbfile))
     B = np.array(fake_born('get_born/fake_o'))
-    R, R_id = R_wrapper(get_atoms(full_path_pdb), 12)
+    R, R_id = R_wrapper(get_atoms(pdbfile), 12)
     df_dict = {'charges': C,
                        'R': R.numpy(),
                        'R_id': R_id.numpy(),
                        'B': B}
     df = pd.DataFrame({k : pd.Series(v.reshape([-1])) for k, v in df_dict.items()})
-    df.to_hdf(pdbfile.split('.')[0] + ".h5", pdbfile.split('.')[0])
-    return C, B, R, R_id
+    return df
 
 def transform_matrices(C, B, R, R_id):
     C_neighbors = np.zeros([len(C), R.shape[1]])
     B_neighbors = np.zeros([len(B)])
-get_pdb_dataframe('/home/ali/calstate/amber/','ras-raf.pdb')
+# get_pdb_dataframe('/home/ali/calstate/amber/','ras-raf.pdb')

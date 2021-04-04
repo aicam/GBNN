@@ -3,6 +3,7 @@ from biopandas.pdb import PandasPdb
 
 
 def get_atoms(pdbfile):
+    pdbfile = '/'.join(pdbfile.split('/')[1:])
     pdb = PandasPdb().read_pdb(pdbfile)
     coors = pdb.df['ATOM'][['x_coord', 'y_coord', 'z_coord']].to_numpy()
     return tf.Variable(coors)
@@ -14,8 +15,8 @@ def AtomDistance(x, y):
 
 
 def R_wrapper(coors, M):
-    R = tf.reshape(tf.Variable([.1 for i in range(12)], dtype=tf.float32), shape=[1, 12])
-    R_id = tf.reshape(tf.Variable([1 for i in range(12)], dtype=tf.int32), shape=[1, 12])
+    R = tf.reshape(tf.Variable([.1 for i in range(M)], dtype=tf.float32), shape=[1, M])
+    R_id = tf.reshape(tf.Variable([1 for i in range(M)], dtype=tf.int32), shape=[1, M])
 
     @tf.function
     def get_R_matrix(coors, M):
