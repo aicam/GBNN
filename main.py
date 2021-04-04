@@ -1,9 +1,13 @@
-from GB_Layers import MM_Layer
+from GBModel.GB_Layers import MMLayer, GBLayer, FilterLayer
 import tensorflow as tf
-import numpy as np
 
-x = tf.ones((3, 3, 3))
+x = tf.ones((8, 4, 3))
 
-
-print(MM_Layer()(x))
-
+model = tf.keras.models.Sequential()
+model.add(MMLayer())
+model.add(GBLayer())
+model.add(FilterLayer([4, 10]))
+model.add(tf.keras.layers.Conv2D(4, (2, 2)))
+model.add(tf.keras.layers.Flatten())
+model.add(tf.keras.layers.Dense(10, activation='relu'))
+print(model(x))
