@@ -4,9 +4,16 @@ import os
 
 
 
-
+'''
+Get pdb file and run bash script in the get_born directory
+to extract effective born radii of each atom
+'''
 def get_pdb_born(pdbfile):
+
+    ## Change directory to run bash script
     os.chdir("get_born")
+
+    ## Run script
     result = subprocess.run(["./get_born.sh " + pdbfile], executable="/bin/bash",
                               shell=True,
                               stdout=subprocess.PIPE,
@@ -15,16 +22,16 @@ def get_pdb_born(pdbfile):
         if (result.stderr.decode("utf-8") != ""):
             exit(result.stderr.decode("utf-8"))
         continue
-    # print(result.stdout.decode("utf-8"))
+
     # TODO: Ask prof, rinv is consistent?
     lines = result.stdout.decode("utf-8").split("\n")
     B = []
+
+    # Extract inverted bor radii
     for l in lines:
         if l[:4] != "rinv":
             continue
         B.append(float(list(filter(None, l.split(' ')))[2].replace('\n', '')))
     os.chdir('..')
-    # ppdb_df = pandaspdb.read_pdb_from_list(pdb_lines=result.stdout.decode("utf-8").split("\n"))
-    # return ppdb_df.df['ATOM']
+
     return B
-# print(get_born("~/calstate/amber/ras.pdb"))
