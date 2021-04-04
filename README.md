@@ -45,3 +45,5 @@ This function is being performed by Tensorflow (required library) and parallel l
 defined in the <b>AtomDistance(x, y)</b> which is based on Euclidean distance and you can replace it with your atom distance function.
 
 Note: featurizer.py needs to move over directories (os.chdir), therefore don't change the files order
+
+## GB model
