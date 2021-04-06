@@ -1,7 +1,8 @@
 import numpy as np
-import tensorflow as tf
+# import tensorflow as tf
+from biopandas.pdb import PandasPdb
+from deepchem.feat import CircularFingerprint
 
 
-
-
-print(tf.exp(7.29))
+smile = ''.join(PandasPdb().read_pdb('PDBs/ras-raf.pdb').df['ATOM']['atom_name'].to_numpy())
+print(CircularFingerprint().featurize(smile))
