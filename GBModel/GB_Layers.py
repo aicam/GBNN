@@ -4,14 +4,15 @@ from tensorflow import keras
 
 class MMLayer(keras.layers.Layer):
 
-    def __init__(self):
+    def __init__(self, input_dim):
         super(MMLayer, self).__init__()
         self.alpha = tf.Variable(initial_value=tf.ones(1), trainable=True)
+        self.multiplied_ew = tf.Variable(initial_value=tf.zeros(input_dim), trainable=False)
 
     def call(self, inputs):
-        multplied_ew = tf.multiply(inputs[:, :, :1], inputs[:, :, 1:2])
-        return tf.concat([tf.multiply(tf.exp(multplied_ew), self.alpha),
-                          tf.reshape(inputs[:, :, 2], [inputs.shape[0], inputs.shape[1], 1])], axis=2)
+        self.multiplied_ew.assign(tf.multiply(inputs[0,:, :, :1], inputs[0,:, :, 1:2]))
+        return tf.concat([tf.multiply(tf.exp(self.multiplied_ew), self.alpha),
+                          tf.reshape(inputs[0, :, :, 2], [tf.shape(inputs)[1], tf.shape(inputs)[2], 1])], axis=2)
 
 
 class GBLayer(keras.layers.Layer):

@@ -21,8 +21,8 @@ def fake_born(fake_file):
 '''
 def get_pdb_dataframe(pdbfile):
     C = np.array(get_pdb_charges(pdbfile))
-    # B = np.array(get_pdb_born(pdbfile))
-    B = np.array(fake_born('get_born/fake_o'))
+    B = np.array(get_pdb_born(pdbfile))
+    # B = np.array(fake_born('get_born/fake_o'))
     R, R_id = R_wrapper(get_atoms(pdbfile), 12)
     df_dict = {'charges': C,
                        'R': R.numpy(),
