@@ -29,4 +29,3 @@ def get_pdb_charges(pdbfile):
     ppdb_df = pandaspdb.read_pdb_from_list(pdb_lines=s.decode("utf-8").split("\n"))
     os.chdir('..')
     return ppdb_df.df['ATOM']["b_factor"].to_numpy()
-

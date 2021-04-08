@@ -10,7 +10,8 @@ def get_atoms(pdbfile):
     coors = pdb.df['ATOM'][['x_coord', 'y_coord', 'z_coord']].to_numpy()
     return tf.Variable(coors)
 
-
+## ambpdb
+## h++
 '''
  Distance function for atoms
 '''

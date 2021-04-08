@@ -3,12 +3,6 @@ import tensorflow as tf
 import numpy as np
 
 x = np.ones((1, 8, 4, 3))
-from deepchem import models
-# x1 = MMLayer()(x)
-# print(x1.shape)
-# x2 = GBLayer()(x1)
-# print(x2.shape)
-# print(FilterLayer([4, 10])(x2).shape)
 model = tf.keras.models.Sequential()
 model.add(MMLayer())
 model.add(GBLayer())

@@ -1,6 +1,6 @@
 from Featurizer.get_born import *
 from Featurizer.get_charges import *
-from Featurizer.get_radius import *
+from Featurizer.get_distance import *
 import pandas as pd
 import numpy as np
 
