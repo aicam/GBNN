@@ -1,13 +1,30 @@
 import tensorflow as tf
 from biopandas.pdb import PandasPdb
+import os
+import subprocess
 
 '''
  Get atom coordinates from pdb file
 '''
-def get_atoms(pdbfile):
-    pdbfile = '/'.join(pdbfile.split('/')[1:])
-    pdb = PandasPdb().read_pdb(pdbfile)
-    coors = pdb.df['ATOM'][['x_coord', 'y_coord', 'z_coord']].to_numpy()
+def get_atoms_coordinates(pdbfile):
+    ## Change directory to run bash script
+    os.chdir("get_distance")
+
+    ## Run script
+    result = subprocess.Popen(["./get_distance.sh " + pdbfile], executable="/bin/bash",
+                              shell=True,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE)
+    s, e = result.communicate()
+    while (s.decode("utf-8") == ""):
+        if (e.decode("utf-8") != ""):
+            exit(e.decode("utf-8"))
+        continue
+
+    pandaspdb = PandasPdb()
+    ppdb_df = pandaspdb.read_pdb_from_list(pdb_lines=s.decode("utf-8").split("\n"))
+    os.chdir('..')
+    coors = ppdb_df.df['ATOM'][['x_coord', 'y_coord', 'z_coord']].to_numpy()
     return tf.Variable(coors)
 
 ## ambpdb
@@ -51,4 +68,3 @@ def R_wrapper(coors, M):
 
     R_matrix = get_R_matrix(coors, M)
     return R_matrix[1], R_matrix[2]
-

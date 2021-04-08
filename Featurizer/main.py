@@ -20,10 +20,16 @@ def fake_born(fake_file):
  Use all feature extractor functions to generate dataframe 
 '''
 def get_pdb_dataframe(pdbfile):
+    print('Get charges has been started...')
     C = np.array(get_pdb_charges(pdbfile))
+    print('Get charges finished with shape: ' + str(C.shape))
+    print('Get distances started...')
+    R, R_id = R_wrapper(get_atoms_coordinates(pdbfile), 12)
+    print('Get distances finished with shape:' + str(R.shape))
+    print('Get effective Born radii started...')
     B = np.array(get_pdb_born(pdbfile))
+    print('Get effective Born radii finished with shape:' + str(B.shape))
     # B = np.array(fake_born('get_born/fake_o'))
-    R, R_id = R_wrapper(get_atoms(pdbfile), 12)
     df_dict = {'charges': C,
                        'R': R.numpy(),
                        'R_id': R_id.numpy(),

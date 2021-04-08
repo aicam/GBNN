@@ -1,0 +1,8 @@
+source leaprc.protein.ff14SB
+set default PBRadii mbondi
+fake = loadpdb fake.pdb
+charge fake
+source leaprc.water.tip3p
+solvatebox fake TIP3PBOX 12.0
+savePdb fake fake_o.pdb
+quit
