@@ -20,7 +20,7 @@ def fake_born(fake_file):
  Use all feature extractor functions to generate dataframe 
 '''
 def get_pdb_dataframe(pdbfile):
-    print('Get charges has been started...')
+    print('Get charges has been started... ' + pdbfile.split('/')[-1])
     C = np.array(get_pdb_charges(pdbfile))
     print('Get charges finished with shape: ' + str(C.shape))
     print('Get distances started...')

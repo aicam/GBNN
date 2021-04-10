@@ -1,7 +1,7 @@
 # About project
 This project has two parts: first is the featurizer which extract "partial charges", "effective Born radii" and "Distances" between atoms from PDB files.
 This featurizers is being used to generate pandas dataframes with hdf5 format instead of PDB raw data. The second part is a deep learning model based on 
-Grid-Based Surface Generalized Born Model for calculating free binding energy between protein and ligand. <br><br>
+molecular mechanics with generalised Born and surface area solvation (MMGB/SA) for calculating free binding energy between protein and ligand. <br><br>
 This library uses Amber as the application to featurize pdb files, in this regard, $AMBERHOME environment variable should be set. Furthermore, because Amber does not 
 provide API from python, you can find bash scripts under Featurizer folder which simulate user in Amber to extract information.
 
@@ -16,9 +16,11 @@ You need to give executable permission to bash script files:
 cd Featurizer
 sudo chmod +x get_born/get_born.sh
 sudo chmod +x get_charges/get_charges.sh
+sudo chmod +x get_distance/get_distance.sh
 ```
 Next, you should place your PDB files under root directory for example PDBs and create a directory for output dataframes to be stored at.
 ## Featurizer
+First, the complex (PDB) will be solvated on TIP3PBOX 12.0 first and all operations will be done afterwards.
 Featurizer script will crawl over all pdb files placed on the pdb directory (-i option) and create a .h5 dataframe in the output directory (-o option) for each one.
 ```SH
 python3 Featurizer.py -i <PDB files directory name under the root> -o <Output directory name under the root>
