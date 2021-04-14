@@ -1,6 +1,3 @@
-import numpy as np
-from biopandas.pdb import PandasPdb
-from deepchem.feat import CircularFingerprint
+from GBModel.input_generator import generate_X
 
-smile = ''.join(PandasPdb().read_pdb('PDBs/ras-raf.pdb').df['ATOM']['atom_name'].to_numpy())
-print(CircularFingerprint().featurize(smile))
+print(generate_X('input', 12).shape)
