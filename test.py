@@ -1,3 +1,3 @@
-from GBModel.input_generator import generate_X
+import deepchem as dc
 
-print(generate_X('input', 12).shape)
+featurizer=dc.feat.ConvMolFeaturizer()

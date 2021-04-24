@@ -5,9 +5,9 @@
 cp $1 ./fake.pdb
 
 # get new pdb with charges
-$AMBERHOME/bin/tleap -f tleap_get_charges.in > /dev/null
+$AMBERHOME/bin/tleap -f tleap_get_charges.in
 
-cat fake_o.pdb
+#cat fake_o.pdb
 
 # remove fake pdb files
 rm ./fake.pdb
