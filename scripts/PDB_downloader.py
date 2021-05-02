@@ -3,7 +3,7 @@ import numpy as np
 import os
 import sys
 import urllib
-
+import urllib.request
 PDB_directory = '../PDBs'
 
 

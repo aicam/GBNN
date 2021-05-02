@@ -7,7 +7,6 @@ class MMLayer(keras.layers.Layer):
     def __init__(self):
         super(MMLayer, self).__init__()
         self.alpha = tf.Variable(initial_value=tf.ones(1), trainable=True)
-        # self.multiplied_ew = tf.Variable(initial_value=tf.zeros(input_dim), trainable=False)
 
     def cell_function_map(self, input):
         multiplied_ew = (tf.multiply(input[:, :, :1], input[:, :, 1:2]))
@@ -17,9 +16,7 @@ class MMLayer(keras.layers.Layer):
 
     def call(self, inputs):
         return tf.map_fn(fn = lambda i: self.cell_function_map(i), elems=inputs)
-        # self.multiplied_ew.assign(tf.multiply(inputs[0,:, :, :1], inputs[0,:, :, 1:2]))
-        # return tf.concat([tf.multiply(tf.exp(self.multiplied_ew), self.alpha),
-        #                   tf.reshape(inputs[0, :, :, 2], [tf.shape(inputs)[1], tf.shape(inputs)[2], 1])], axis=2)
+
 
 
 class GBLayer(keras.layers.Layer):
