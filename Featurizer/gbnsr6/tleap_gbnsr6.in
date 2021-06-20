@@ -1,0 +1,22 @@
+source oldff/leaprc.ff99SB
+set default PBRadii mbondi2
+source leaprc.water.tip3p
+source leaprc.gaff
+loadamberparams g1.frcmod
+loadamberprep g1.prep
+LIG = loadmol2 guest-1.mol2
+REC = loadmol2 host-cb7.mol2
+COMPLEX = combine {REC LIG}
+savepdb COMPLEX cb7-g1.pdb
+saveamberparm COMPLEX cb7-g1.prmtop cb7-g1.inpcrd
+addIons2 COMPLEX Cl- 0
+solvatebox COMPLEX TIP3PBOX 11
+savepdb COMPLEX cb7-g1-solvated.pdb
+saveamberparm COMPLEX cb7-g1-solvated.prmtop cb7-g1-solvated.inpcrd
+addIons2 LIG Cl- 0
+solvatebox LIG TIP3PBOX 11
+savepdb LIG g1-solvated.pdb
+saveamberparm LIG g1-solvated.prmtop g1-solvated.inpcrd
+solvatebox REC TIP3PBOX 11
+savepdb REC cb7-solvated.pdb
+saveamberparm REC cb7-solvated.prmtop cb7-solvated.inpcrd

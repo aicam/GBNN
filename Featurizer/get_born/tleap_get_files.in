@@ -1,4 +1,6 @@
-source leaprc.protein.ff14SB
+source oldff/leaprc.lipid11
+source oldff/leaprc.parmbsc0_chiOL4_ezOL1
+source oldff/leaprc.ff14SB
 set default PBRadii mbondi
 fake = loadpdb fake.pdb
 charge fake
