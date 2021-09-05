@@ -12,4 +12,3 @@ model.add(tf.keras.layers.Flatten())
 model.add(tf.keras.layers.Dense(1, activation='relu'))
 model.compile(loss='MSE', optimizer='adam')
 
-print(model.fit(x, np.zeros([1, 1]), epochs=2))
