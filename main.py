@@ -1,7 +1,7 @@
 from GBModel.GB_Layers import MMLayer, GBLayer, FilterLayer
 import tensorflow as tf
 import numpy as np
-
+from deepchem.feat.mol_graphs import ConvMol
 x = np.ones((1, 8, 4, 3))
 model = tf.keras.models.Sequential()
 model.add(MMLayer())
