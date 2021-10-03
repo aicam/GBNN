@@ -14,3 +14,5 @@ model.add(tf.keras.layers.Flatten())
 model.add(tf.keras.layers.Dense(1, activation='relu'))
 model.compile(loss='MSE', optimizer='adam')
 
+from deepchem.metrics import to_one_hot
+from deepchem.models.layers import GraphConv, GraphPool, GraphGather
