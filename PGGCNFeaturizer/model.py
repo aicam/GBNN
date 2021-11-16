@@ -1,4 +1,5 @@
 import tensorflow as tf
+from deepchem.feat.mol_graphs import ConvMol
 
 class PGGCN(tf.keras.Model):
     def __init__(self,):
