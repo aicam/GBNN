@@ -56,7 +56,17 @@ class PGGCNFeaturizer:
                     atom_bonds.append([neighbor_idx, self.convertBONDtoOneHotVector(bond_type)])
                 adjacency_list.append(atom_bonds)
 
-            inputs.append([atom_features, adjacency_list])
+            # host dataframe is the key name based on RCSB PDB id and a ligand which is binded
+            # these data are prepared by Amber tools by GBNSR6 method
+            host_df = self.physics_df[self.physics_df['Host'] == mol_name]
+            gbnsr6_features = host_df[['gb_Complex_1-4EEL',
+                                       'gb_Complex_EELEC', 'gb_Complex_EGB', 'gb_Complex_ESURF', 'pb_complex_VDWAALS',
+                                       'gb_guest_1-4EEL', 'gb_guest_EELEC', 'gb_guest_EGB',
+                                       'gb_guest_ESURF', 'pb_guest_VDWAALS', 'gb_host_1-4EEL', 'gb_host_EELEC',
+                                       'gb_host_EGB', 'gb_host_ESURF', 'pb_host_VDWAALS']].to_numpy()[0]
+
+            inputs.append([atom_features, adjacency_list, gbnsr6_features])
+
 
         return inputs
 
