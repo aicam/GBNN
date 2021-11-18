@@ -1,11 +1,14 @@
 import numpy as np
-from deepchem.feat.graph_features import ConvMolFeaturizer
+import deepchem as dc
+import os
 
-class PGGCNFeaturizer(ConvMolFeaturizer):
+class PGGCNFeaturizer:
 
 
 
-    def __init__(self,
+    def __init__(self, PDB_directory, physics_csv, atom_csv_directory):
+        self.PDB_directory = PDB_directory
+        self.physics_csv = physics_csv
+        self.atom_csv_directory = atom_csv_directory
 
-                 ):
-        super(PGGCNFeaturizer, self).__init__()
+    def featurize(self):
