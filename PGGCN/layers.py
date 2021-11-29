@@ -1,12 +1,14 @@
 import tensorflow as tf
 
+import tensorflow as tf
+
 class MultiGraphConvLayer(tf.keras.Model):
     def __init__(self,
                  out_channel,
                  num_features=81,
                  num_bond=22,
                  activation_fn=None,
-                 combination_rules = None
+                 combination_rules = []
                  ):
         super(MultiGraphConvLayer, self).__init__()
         self.out_channel = out_channel
@@ -20,10 +22,10 @@ class MultiGraphConvLayer(tf.keras.Model):
         (shape=[num_features + num_bond, out_channel]),
                                shape=[num_features + num_bond, out_channel], trainable=True)
 
-    def AtomDistance(x, y):
+    def AtomDistance(self, x, y):
         return tf.sqrt(tf.reduce_sum(tf.square(x - y)))
 
-    def addRule(self, start_index, rule, end_index = None):
+    def addRule(self, rule, start_index, end_index = None):
         rules_dict = {
             "sum": tf.math.add,
             "multiply": tf.math.multiply,
@@ -59,8 +61,8 @@ class MultiGraphConvLayer(tf.keras.Model):
                                                                   neighbour_features[indices[0]:]))
                     else:
                         if rule_function == 'distance':
-                            distance = self.AtomDistance(self_features[0][indices[0]:indices[1]],
-                                                         neighbour_features[indices[0]:indices[1]])
+                            distance = self.AtomDistance(x=self_features[0][indices[0]:indices[1]],
+                                                    y=neighbour_features[indices[0]:indices[1]])
                             new_ordered_features.append(neighbour_features[indices[0]:indices[1]])
                         else:
                             new_ordered_features.append(rule_function(self_features[0][indices[0]:indices[1]],
