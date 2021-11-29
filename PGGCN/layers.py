@@ -1,5 +1,8 @@
 import tensorflow as tf
 import deepchem as dc
+from deepchem.models.layers import GraphConv, GraphPool, GraphGather
+
+
 
 
 dc.models.GraphConvModel(n_tasks, mode='classification')
