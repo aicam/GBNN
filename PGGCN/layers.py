@@ -1,8 +1,6 @@
 import tensorflow as tf
 
-import tensorflow as tf
-
-class MultiGraphConvLayer(tf.keras.Model):
+class RuleGraphConvLayer(tf.keras.Model):
     def __init__(self,
                  out_channel,
                  num_features=81,
@@ -10,7 +8,7 @@ class MultiGraphConvLayer(tf.keras.Model):
                  activation_fn=None,
                  combination_rules = []
                  ):
-        super(MultiGraphConvLayer, self).__init__()
+        super(RuleGraphConvLayer, self).__init__()
         self.out_channel = out_channel
         self.num_features = num_features
         self.num_bond = num_bond
@@ -73,8 +71,53 @@ class MultiGraphConvLayer(tf.keras.Model):
                 new_ordered_features = tf.concat([new_ordered_features, neighbour_bond], axis=0)
                 new_ordered_features = tf.reshape(new_ordered_features, [1, self.num_features + self.num_bond])
                 new_features[i] += tf.matmul(new_ordered_features, self.w_n)
-        return ([new_features, adjacency_list, inp[2:]])
+                new_features[i] = new_features[i][0]
+        return ([tf.Variable(new_features, trainable=False), adjacency_list, inp[2]])
 
     def call(self, inputs):
-        return tf.map_fn(fn = lambda i: self._call_single(i), elems = inputs)
+        output = []
+        for inp in inputs:
+            output.append(self._call_single(inp))
+        return output
 
+
+class GraphConvLayer(tf.keras.Model):
+    def __init__(self,
+                 out_channel,
+                 num_features=80,
+                 activation_fn=tf.keras.activations.relu,
+                 ):
+        super(GraphConvLayer, self).__init__()
+        self.out_channel = out_channel
+        self.num_features = num_features
+        self.activation_fn = activation_fn
+        self.w_s = tf.Variable(initial_value=tf.initializers.glorot_uniform()
+        (shape=[num_features, out_channel]), shape=[num_features, out_channel], trainable=True)
+        self.w_n = tf.Variable(initial_value=tf.initializers.glorot_uniform()
+        (shape=[num_features, out_channel]),
+                               shape=[num_features, out_channel], trainable=True)
+
+
+    def _call_single(self, inp):
+        features = inp[0]
+        adjacency_list = inp[1]
+        new_features = features.shape[0] * [None]
+        for i, adj in enumerate(adjacency_list):
+            self_features = tf.reshape(features[i], [1, self.num_features])
+            self_conv_features = tf.matmul(self_features, self.w_s)
+            new_features[i] = self_conv_features
+            for neighbour in adj:
+                neighbour_features = features[neighbour[0]]
+                neighbour_bond = neighbour[1]
+                neighbour_features = tf.reshape(neighbour_features, [1, self.num_features])
+                new_features[i] += tf.matmul(neighbour_features, self.w_n)
+                new_features[i] = new_features[i][0]
+                if self.activation_fn != None:
+                    new_features[i] = self.activation_fn(new_features[i])
+        return ([tf.Variable(new_features, trainable=False), adjacency_list, inp[2]])
+
+    def call(self, inputs):
+        output = []
+        for inp in inputs:
+            output.append(self._call_single(inp))
+        return output
