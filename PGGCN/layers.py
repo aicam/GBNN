@@ -51,6 +51,8 @@ class RuleGraphConvLayer(tf.keras.Model):
                 neighbour_bond = neighbour[1]
                 new_ordered_features = []
                 distance = None
+
+                ## Rule based feature combination
                 for j, rule in enumerate(self.combination_rules):
                     rule_function = rule[1]
                     indices = rule[0]
@@ -70,6 +72,8 @@ class RuleGraphConvLayer(tf.keras.Model):
                     new_ordered_features /= distance ** 2
                 new_ordered_features = tf.concat([new_ordered_features, neighbour_bond], axis=0)
                 new_ordered_features = tf.reshape(new_ordered_features, [1, self.num_features + self.num_bond])
+
+
                 new_features[i] += tf.matmul(new_ordered_features, self.w_n)
                 new_features[i] = new_features[i][0]
         return ([tf.Variable(new_features, trainable=False), adjacency_list, inp[2]])
