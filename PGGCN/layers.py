@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-class RuleGraphConvLayer(tf.keras.Model):
+class RuleGraphConvLayer(tf.keras.layers.Layer):
     def __init__(self,
                  out_channel,
                  num_features=81,
@@ -76,7 +76,7 @@ class RuleGraphConvLayer(tf.keras.Model):
 
                 new_features[i] += tf.matmul(new_ordered_features, self.w_n)
                 new_features[i] = new_features[i][0]
-        return ([tf.Variable(new_features, trainable=False), adjacency_list, inp[2]])
+        return ([tf.Variable(new_features, trainable=False), adjacency_list])
 
     def call(self, inputs):
         output = []
@@ -85,7 +85,7 @@ class RuleGraphConvLayer(tf.keras.Model):
         return output
 
 
-class GraphConvLayer(tf.keras.Model):
+class GraphConvLayer(tf.keras.layers.Layer):
     def __init__(self,
                  out_channel,
                  num_features=80,
@@ -118,7 +118,7 @@ class GraphConvLayer(tf.keras.Model):
                 new_features[i] = new_features[i][0]
                 if self.activation_fn != None:
                     new_features[i] = self.activation_fn(new_features[i])
-        return ([tf.Variable(new_features, trainable=False), adjacency_list, inp[2]])
+        return ([tf.Variable(new_features, trainable=False), adjacency_list])
 
     def call(self, inputs):
         output = []
