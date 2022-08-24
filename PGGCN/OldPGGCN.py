@@ -83,7 +83,7 @@ class GBGraphConvModel(tf.keras.Model):
         self.dense2 = layers.Dense(1)
         self.dense3 = layers.Dense(1,
                                    kernel_initializer=initializers.Constant(
-                                       [.5, -1, -1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1]),
+                                       [.5, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1]),
                                    bias_initializer=initializers.Zeros())
 
     def call(self, inputs):
@@ -138,5 +138,5 @@ his_arr = []
 epochs = 2
 for _ in range(epochs):
     his_arr.append(model.fit_generator(data_generator(train_dataset, 1)))
-
+print(his_arr)
 np.save("res", np.array(his_arr))
