@@ -2,12 +2,51 @@ import conda_installer
 
 conda_installer.install()
 
-import rdkit
+from rdkit import Chem
 import deepchem as dc
 import pandas as pd
 import numpy as np
-from deepchem.metrics import to_one_hot
 from deepchem.feat.mol_graphs import ConvMol
+
+featurizer = dc.feat.ConvMolFeaturizer(per_atom_fragmentation=False)
+TRAIN_SET = .8
+
+df = pd.read_csv('../Datasets/pdbbind.csv')
+df = df.dropna()
+
+# truncate for memory optimization
+df = df[:2]
+
+complex_names_df = df['complex-name'].to_numpy()
+PDBs = {}
+from os import listdir
+from os.path import isfile, join
+
+pdbs_path = '../Datasets/pdbbind_complex/'
+onlyfiles = [f for f in listdir(pdbs_path) if isfile(join(pdbs_path, f))]
+for f in onlyfiles:
+    if f.split('.')[0] in complex_names_df:
+        PDBs.update({f.split('.')[0]: Chem.rdmolfiles.MolFromPDBFile(pdbs_path + f)})
+
+X_ids = []
+X = []
+for k in PDBs.keys():
+    X_ids.append(k)
+    X.append(featurizer.featurize(PDBs[k])[0])
+
+X_disk = []
+y_disk = []
+for i in range(len(X_ids)):
+    X_disk.append(X[i])
+    y_disk.append(df[df['complex-name'] == X_ids[i]]['ddg'].to_numpy()[0])
+w_disk = np.ones([5, 12])
+X_add = []
+for i in range(len(X_ids)):
+    X_add.append(df[df['complex-name'] == X_ids[i]][[i for i in df.columns if ((('gb-' in i))
+                                                                               and ('-etot' not in i)) or (
+                                                                 '-vdwaals' in i)]].to_numpy()[0])
+train_dataset = dc.data.DiskDataset.from_numpy(X=X_disk, y=y_disk, w=w_disk, ids=X_ids)
+X_add = np.array(X_add)
 
 ### Model ###
 
@@ -71,48 +110,6 @@ class GBGraphConvModel(tf.keras.Model):
 
 ### Model ###
 
-featurizer = dc.feat.ConvMolFeaturizer(per_atom_fragmentation=False)
-TRAIN_SET = .8
-
-df = pd.read_csv('../Datasets/pdbbind.csv')
-df = df.dropna()
-
-# truncate for memory optimization
-df = df[:3]
-
-complex_names_df = df['complex-name'].to_numpy()
-PDBs = {}
-from os import listdir
-from os.path import isfile, join
-
-pdbs_path = '../Datasets/pdbbind_complex/'
-onlyfiles = [f for f in listdir(pdbs_path) if isfile(join(pdbs_path, f))]
-for f in onlyfiles:
-    if f.split('.')[0] in complex_names_df:
-        try:
-            PDBs.update({f.split('.')[0]: rdkit.Chem.rdmolfiles.MolFromPDBFile(pdbs_path + f)})
-        except:
-            continue
-
-X_ids = []
-X = []
-for k in PDBs.keys():
-    X_ids.append(k)
-    X.append(featurizer.featurize(PDBs[k]))
-
-X_disk = []
-y_disk = []
-for i in range(len(X_ids)):
-    X_disk.append(X[i])
-    y_disk.append(df[df['complex-name'] == X_ids[i]]['ddg'].to_numpy()[0])
-w_disk = np.ones([5, 12])
-X_add = []
-for i in range(len(X_ids)):
-    X_add.append(df[df['complex-name'] == X_ids[i]][[i for i in df.columns if ((('gb-' in i))
-                                                                               and ('-etot' not in i)) or (
-                                                                 '-vdwaals' in i)]].to_numpy()[0])
-train_dataset = dc.data.DiskDataset.from_numpy(X=X_disk, y=y_disk, w=w_disk, ids=X_ids)
-X_add = np.array(X_add)
 
 batch_size = len(df)
 
@@ -126,18 +123,20 @@ model = dc.models.KerasModel(GBGraphConvModel(batch_size), loss=loss_function)
 
 def data_generator(dataset, epochs=30):
     for ind, (X_b, y_b, w_b, ids_b) in enumerate(dataset.iterbatches(batch_size, epochs,
-                                                                     deterministic=False, pad_batches=True)):
+                                                                   deterministic=False, pad_batches=True)):
         multiConvMol = ConvMol.agglomerate_mols(X_b)
         inputs = [multiConvMol.get_atom_features(), multiConvMol.deg_slice, np.array(multiConvMol.membership)]
         for i in range(1, len(multiConvMol.get_deg_adjacency_lists())):
             inputs.append(multiConvMol.get_deg_adjacency_lists()[i])
-        #        inputs.append(X_add)
-        #         print(inputs[13])
+#        inputs.append(X_add)
+#         print(inputs[13])
         labels = y_b
         weights = [w_b]
         yield (inputs, labels, weights)
 
+his_arr = []
+epochs = 2
+for _ in range(epochs):
+    his_arr.append(model.fit_generator(data_generator(train_dataset, 1)))
 
-his = model.fit_generator(data_generator(train_dataset, 1))
-print(his)
-np.save("res.txt", np.array(his))
+np.save("res", np.array(his_arr))
