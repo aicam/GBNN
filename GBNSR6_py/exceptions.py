@@ -15,3 +15,11 @@ class PoistionsNumberWarning(GBNSR6_Warning):
 class PositionException(GBNSR6_Error):
     ''' position is not convertable '''
     pass
+
+class PositionDecimalExceed(GBNSR6_Error):
+    ''' each position can have up to 7 floating decimals and 4 non-floating decimals '''
+    pass
+
+class FilePermission(GBNSR6_Error):
+    ''' file permission not granted '''
+    pass
