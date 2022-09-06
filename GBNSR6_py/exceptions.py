@@ -23,3 +23,7 @@ class PositionDecimalExceed(GBNSR6_Error):
 class FilePermission(GBNSR6_Error):
     ''' file permission not granted '''
     pass
+
+class LEaPProgramFailed(GBNSR6_Error):
+    ''' in case of error in running tleap '''
+    pass
