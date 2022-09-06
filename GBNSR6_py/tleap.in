@@ -1,0 +1,8 @@
+source oldff/leaprc.ff99SB
+set default PBRadii mbondi2
+source leaprc.water.tip3p
+com = loadpdb complex.pdb
+saveamberparm com com.prmtop com.inpcrd
+solvatebox com TIP3PBOX 12.0
+saveamberparm com com_solvated.prmtop com_solvated.inpcrd
+quit

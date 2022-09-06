@@ -1,6 +1,6 @@
 import warnings
 
-from utils import get_numbers
+from utils import get_numbers, generate_inpcrd_num
 from exceptions import PositionException, PoistionsNumberWarning, FilePermission
 
 def parse_raw_inpcrd(lines, mod = 3, replacement ="\n", skip_first = 2, skip_last = 1, split_by ='  '):
@@ -61,7 +61,7 @@ def parse_traj(lines, num_atoms, num_total, mod = 3, replacement ="\n", split_by
     if p_counter != 0:
         warnings.warn("Number of positions was not as expected, remained (%d)" % p_counter, PoistionsNumberWarning)
 
-def store_frame_inpcrd(coords, fp = './complex.inpcrd'):
+def store_frame_inpcrd(coords, mod = 3, per_line = 6, fp = './complex.inpcrd'):
     try:
         f = open(fp, 'w')
     except:
@@ -71,3 +71,12 @@ def store_frame_inpcrd(coords, fp = './complex.inpcrd'):
     f.write('  ' + str(len(coords)) + '\n')
 
     counter_p = 0 # counts number of positions already written in a line
+
+    for coordMD in coords:
+        for coord1D in coordMD:
+            f.write(generate_inpcrd_num(coord1D))
+            counter_p += 1
+            if counter_p % per_line == 0:
+                f.write("\n")
+
+    f.close()
