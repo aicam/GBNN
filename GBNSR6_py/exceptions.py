@@ -27,3 +27,7 @@ class FilePermission(GBNSR6_Error):
 class LEaPProgramFailed(GBNSR6_Error):
     ''' in case of error in running tleap '''
     pass
+
+class AMBERNOTFound(GBNSR6_Error):
+    ''' $AMBERHOME is not defined '''
+    pass

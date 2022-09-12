@@ -34,8 +34,7 @@ def parse_raw_inpcrd(lines, mod = 3, replacement ="\n", skip_first = 2, skip_las
         warnings.warn("Number of positions was not as expected, remained (%d)" % counter, PoistionsNumberWarning)
     return com_pos
 
-def parse_traj(lines, num_atoms, num_total, mod = 3, replacement ="\n", split_by ='  '):
-    # skip lines from the beginning and end of the file if they are not useful
+def parse_traj(lines, num_atoms, num_total, mod = 3):
 
     com_pos = [] # complex position
     new_md = [] # each 3d (mod) position generated in each iteration
@@ -61,7 +60,7 @@ def parse_traj(lines, num_atoms, num_total, mod = 3, replacement ="\n", split_by
     if p_counter != 0:
         warnings.warn("Number of positions was not as expected, remained (%d)" % p_counter, PoistionsNumberWarning)
 
-def store_frame_inpcrd(coords, mod = 3, per_line = 6, fp = './complex.inpcrd'):
+def store_frame_inpcrd(coords, per_line = 6, fp = './complex.inpcrd'):
     try:
         f = open(fp, 'w')
     except:
@@ -80,3 +79,33 @@ def store_frame_inpcrd(coords, mod = 3, per_line = 6, fp = './complex.inpcrd'):
                 f.write("\n")
 
     f.close()
+
+def read_gbnsr6_output(path):
+    f = open(path)
+    lines = f.readlines()
+    start = 0
+    res_lines = []
+    for i in range(len(lines)):
+        if lines[i].__contains__('FINAL RESULT'):
+            start = i + 3
+            break
+    for l in lines[start:]:
+        if not l.__contains__('-------'):
+            res_lines.append(l.replace('\n', ''))
+        else:
+            break
+    i = 1
+    result = {}
+    l = res_lines[i]
+    result['Etot'] = get_numbers(l.split('EKtot')[0])[0]
+    result['EKtot'] = get_numbers(l.split('EKtot')[1], 1)[0]
+    result['EPtot'] = get_numbers(l.split('EPtot')[1])[0]
+    i += 3
+    l = res_lines[i]
+    result['EELEC'] = get_numbers(l.split('EGB')[0])[0]
+    result['EGB'] = get_numbers(l.split('EGB')[1], 1)[0]
+    i += 1
+    l = res_lines[i]
+    result['ESURF'] = get_numbers(l.split('=')[1])[0]
+
+    return result
