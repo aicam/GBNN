@@ -34,11 +34,12 @@ def parse_raw_inpcrd(lines, mod = 3, replacement ="\n", skip_first = 2, skip_las
         warnings.warn("Number of positions was not as expected, remained (%d)" % counter, PoistionsNumberWarning)
     return com_pos
 
-def parse_traj(lines, num_atoms, num_total, mod = 3):
+def parse_traj(lines, num_atoms, num_total, mod = 3, skip = 1, end_frame = 9999):
 
     com_pos = [] # complex position
     new_md = [] # each 3d (mod) position generated in each iteration
     p_counter = 0 # count position when reach 3d (mod)
+    skip_counter = 0 # skip frames based on skip in input
     frame = 0
 
     # for each line of the lines
@@ -52,9 +53,14 @@ def parse_traj(lines, num_atoms, num_total, mod = 3):
                 p_counter = 0
                 new_md = []
                 if len(com_pos) == num_total:
+                    frame += 1
+                    if frame > end_frame:
+                        return
+                    if frame % skip != 0:
+                        com_pos = []
+                        continue
                     ## we store all atoms in solvated form but return only the dry positions
                     yield com_pos[:num_atoms], frame
-                    frame += 1
                     com_pos = []
 
     if p_counter != 0:

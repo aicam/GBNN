@@ -1,3 +1,4 @@
+from exceptions import AMBERNOTFound
 def find_program(program, search_path = False):
    """ Searches for a program in $AMBERHOME first, then PATH if we allow
        PATH searching.
@@ -10,7 +11,7 @@ def find_program(program, search_path = False):
    def get_amberhome():
       ambhome = os.getenv('AMBERHOME')
       if ambhome == None:
-         raise MMPBSA_Error('AMBERHOME is not set!')
+         raise AMBERNOTFound('AMBERHOME is not set!')
       return ambhome
 
    # Check to see that a path was provided in the program name

@@ -1,12 +1,20 @@
 from exceptions import PositionDecimalExceed
-def get_numbers(line):
+def get_numbers(line, limit = -1):
     new_digit = ''
     numbers = []
-    for c in line:
-        if c.isdigit() or c == '.':
+    is_neg = False
+    for i in range(len(line)):
+        c = line[i]
+        if i < len(line) - 1 and c == '-' and line[i + 1].isdigit():
+            is_neg = True
+        if c.isdigit() or (c == '.' and new_digit != ''):
             new_digit += c
-        if not c.isdigit() and c != '.' and new_digit != '':
-            numbers.append(float(new_digit))
+        if new_digit != '' and c != '.' and (i == len(line) - 1 or not c.isdigit()):
+            new_num = float(new_digit)
+            new_num = -new_num if is_neg else new_num
+            numbers.append(new_num)
+            if len(numbers) == limit:
+                return numbers
             new_digit = ''
     return numbers
 
