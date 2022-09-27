@@ -15,6 +15,8 @@ num_atoms = 3862
 num_solvated = 42193
 skip = 1
 
+total_number_frames = 0
+
 all_records_gbnsr6 = []
 
 for mdcrd_file in mdcrd_files:
@@ -22,10 +24,13 @@ for mdcrd_file in mdcrd_files:
     lines = mdcrd.readlines()
     g = parse_traj(lines, num_atoms, num_solvated, skip=skip)
 
-    f_count = 0
     for fr in g:
         gbnsr6 = {}
         gbnsr6['meta'] = mdcrd_file + "_" + str(fr[1])
+
+        ## TODO: remove this line
+        if total_number_frames == 1:
+            break
 
         # complex
         subprocess.run(['rm', 'complex.inpcrd'])
@@ -70,12 +75,10 @@ for mdcrd_file in mdcrd_files:
         gbnsr6['ligand_ESURF'] = new_res['ESURF']
 
         all_records_gbnsr6.append(gbnsr6)
+        total_number_frames += 1
 
-        f_count += 1
-        print(str(f_count) + " Finished")
-        ## TODO: remove this line
-        if f_count == 2:
-            break
+        print(str(total_number_frames) + " Finished")
+
 
 with open('-'.join(mdcrd_files) + "_" + str(skip) + "_gbnsr6.pkl", 'wb') as handle:
     pickle.dump(all_records_gbnsr6, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -111,3 +114,5 @@ for i in range(1, 2):
 
 with open('-'.join(mdcrd_files) + "_" + str(skip) + "_mmpbsa.pkl", 'wb') as handle:
     pickle.dump(all_records_mmpbsa, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+print("Total number of frames ", total_number_frames)
