@@ -4,7 +4,9 @@ from utils import get_numbers
 import subprocess
 import pickle
 
-AMBERHOME = '/home/ali/Amber/amber22'
+AMBERHOME = os.environ['AMBERHOME'] #'/home/ali/Amber/amber22'
+
+print(AMBERHOME, " Variable is set")
 
 mdcrd_files = []
 for x in sorted(os.listdir()):
@@ -27,10 +29,6 @@ for mdcrd_file in mdcrd_files:
     for fr in g:
         gbnsr6 = {}
         gbnsr6['meta'] = mdcrd_file + "_" + str(fr[1])
-
-        ## TODO: remove this line
-        if total_number_frames == 1:
-            break
 
         # complex
         subprocess.run(['rm', 'complex.inpcrd'])
@@ -77,7 +75,7 @@ for mdcrd_file in mdcrd_files:
         all_records_gbnsr6.append(gbnsr6)
         total_number_frames += 1
 
-        print(str(total_number_frames) + " Finished")
+        print(str(total_number_frames) + " (GBNSR6) Finished")
 
 
 with open('-'.join(mdcrd_files) + "_" + str(skip) + "_gbnsr6.pkl", 'wb') as handle:
@@ -90,6 +88,11 @@ def change_inp_endframe(i):
     for l in open('mmpbsa.in'):
         if l.__contains__('endframe'):
             new_lines.append('   endframe=' + str(i) + ',\n')
+        elif l.__contains__('startframe'):
+            if i == 1:
+                new_lines.append('   startframe=1,\n')
+            else:
+                new_lines.append('   startframe=' + str(i - 1) + ',\n')
         else:
             new_lines.append(l)
     f = open('mmpbsa.in', 'w')
@@ -100,13 +103,14 @@ def change_inp_endframe(i):
 all_records_mmpbsa = []
 
 mmpbsa_dic = {}
-for i in range(1, 2):
-    print("End frame is " + str(i))
+for i in range(1, total_number_frames):
+    print("End frame is (MMPBSA)" + str(i))
     change_inp_endframe(i)
     subprocess.run(['./run_mmpbsa.sh'])
     f = open('FINAL_RESULTS_MMPBSA.dat').readlines()
     gb = ''.join(f).split('GENERALIZED BORN:')[1].split('POISSON BOLTZMANN:')[0]
     mmpbsa_dic = {}
+    mmpbsa_dic['meta'] = str(i)
     for title in ['Complex', 'Receptor', 'Ligand']:
         for param in ['EEL', 'EGB', 'ESURF']:
             mmpbsa_dic[title + '_' + param] = get_numbers(gb.split(title)[1].split('TOTAL')[0].split(param)[1].split('\n')[0])[0]
