@@ -1,6 +1,6 @@
-from Featurizer.get_born import *
+# from Featurizer.get_born import *
+# from Featurizer.get_distance import *
 from Featurizer.get_charges import *
-from Featurizer.get_distance import *
 import pandas as pd
 import numpy as np
 
@@ -22,20 +22,21 @@ def fake_born(fake_file):
 def get_pdb_dataframe(pdbfile):
     print('Get charges has been started... ' + pdbfile.split('/')[-1])
     C = np.array(get_pdb_charges(pdbfile))
+    print(C)
     print('Get charges finished with shape: ' + str(C.shape))
-    print('Get distances started...')
-    R, R_id = R_wrapper(get_atoms_coordinates(pdbfile), 12)
-    print('Get distances finished with shape:' + str(R.shape))
-    print('Get effective Born radii started...')
-    B = np.array(get_pdb_born(pdbfile))
-    print('Get effective Born radii finished with shape:' + str(B.shape))
-    # B = np.array(fake_born('get_born/fake_o'))
-    df_dict = {'charges': C,
-                       'R': R.numpy(),
-                       'R_id': R_id.numpy(),
-                       'B': B}
-    df = pd.DataFrame({k : pd.Series(v.reshape([-1])) for k, v in df_dict.items()})
-    return df
+    # print('Get distances started...')
+    # R, R_id = R_wrapper(get_atoms_coordinates(pdbfile), 12)
+    # print('Get distances finished with shape:' + str(R.shape))
+    # print('Get effective Born radii started...')
+    # B = np.array(get_pdb_born(pdbfile))
+    # print('Get effective Born radii finished with shape:' + str(B.shape))
+    # # B = np.array(fake_born('get_born/fake_o'))
+    # df_dict = {'charges': C,
+    #                    'R': R.numpy(),
+    #                    'R_id': R_id.numpy(),
+    #                    'B': B}
+    # df = pd.DataFrame({k : pd.Series(v.reshape([-1])) for k, v in df_dict.items()})
+    # return df
 
 # TODO: complete this function
 # def transform_matrices(C, B, R, R_id):

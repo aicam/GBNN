@@ -1,7 +1,7 @@
 import subprocess
 import os
 from biopandas.pdb import PandasPdb
-
+import pathlib
 
 
 '''
@@ -11,23 +11,28 @@ to extract partial charges of each atom
 def get_pdb_charges(pdbfile):
 
     ## Change directory to run bash script
-    os.chdir("get_charges")
+    here = os.path.dirname(os.path.abspath(__file__)) + '/get_charges'
+    os.chdir(here)
 
-    ## Run script
-    result = subprocess.Popen(["./get_charges.sh " + pdbfile], executable="/bin/bash",
-                              shell=True,
-                              stdout= subprocess.PIPE,
-                              stderr= subprocess.PIPE)
-    s, e = result.communicate()
-    while (s.decode("utf-8") == ""):
-        if (e.decode("utf-8") != ""):
-            exit(e.decode("utf-8"))
-        continue
+    print('Here in get_charges ', here)
+    print('PDB path ', pdbfile)
 
+    ## TODO: Run script
+    # result = subprocess.Popen([os.path.dirname(__file__) + '/get_charges/get_charges.sh', pdbfile], executable="/bin/bash",
+    #                           shell=True,
+    #                           stdout= subprocess.PIPE,
+    #                           stderr= subprocess.PIPE)
+    # s, e = result.communicate()
+    # while (s.decode("utf-8") == ""):
+    #     if (e.decode("utf-8") != ""):
+    #         exit(e.decode("utf-8"))
+    #     continue
     ## Parse pdb output
-    pandaspdb = PandasPdb()
-    ppdb_df = pandaspdb.read_pdb_from_list(pdb_lines=s.decode("utf-8").split("\n"))
-    os.chdir('..')
-    return ppdb_df.df['ATOM']["b_factor"].to_numpy()
-
-# print(get_pdb_charges('~/calstate/GBNN/PDBs/cd-set1_guest-2_cmb.pdb'))
+    pdb_cat = subprocess.run([here + '/get_charges.sh', pdbfile], capture_output=True).stdout.decode() #s.decode("utf-8").split("\n")
+    charges = []
+    for l in pdb_cat.split("\n"):
+        row = [x for x in l.split(' ') if x != '']
+        if len(row) < 4 or row[0] == 'REMARK':
+            continue
+        charges.append(float(row[-1]))
+    return charges
