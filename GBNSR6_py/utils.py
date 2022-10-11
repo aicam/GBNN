@@ -33,3 +33,11 @@ def generate_inpcrd_num(num):
 
     num_s = ''.join([' ' for i in range(4 - num_d)]) + num_s
     return num_s
+
+def add_zeros(num, max_len = 3):
+    num_s = str(num)
+    num_f = num_s.split('.')[1]
+
+    num_f += ''.join(['0' for i in range(max_len - len(num_f))])
+
+    return num_s.split('.')[0] + '.' + num_f

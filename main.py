@@ -8,7 +8,7 @@ x = np.ones((1, 8, 4, 3))
 import deepchem as dc
 dc.data.DiskDataset.from_numpy()
 from deepchem.feat import AtomicConvFeaturizer
-dc.models.KerasModel
+dc.feat.MolGraphConvFeaturizer
 
 model = tf.keras.models.Sequential()
 model.add(MMLayer())

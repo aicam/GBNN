@@ -1,7 +1,8 @@
 import warnings
 
-from utils import get_numbers, generate_inpcrd_num
+from utils import get_numbers, generate_inpcrd_num, add_zeros
 from exceptions import PositionException, PoistionsNumberWarning, FilePermission
+import numpy as np
 
 def parse_raw_inpcrd(lines, mod = 3, replacement ="\n", skip_first = 2, skip_last = 1, split_by ='  '):
     # skip lines from the beginning and end of the file if they are not useful
@@ -34,7 +35,7 @@ def parse_raw_inpcrd(lines, mod = 3, replacement ="\n", skip_first = 2, skip_las
         warnings.warn("Number of positions was not as expected, remained (%d)" % counter, PoistionsNumberWarning)
     return com_pos
 
-def parse_traj(lines, num_atoms, num_total, mod = 3, skip = 1, end_frame = 9999):
+def parse_traj(lines, num_atoms, num_total, mod = 3, skip = 1, end_frame = 9999, return_full = False):
 
     com_pos = [] # complex position
     new_md = [] # each 3d (mod) position generated in each iteration
@@ -60,7 +61,10 @@ def parse_traj(lines, num_atoms, num_total, mod = 3, skip = 1, end_frame = 9999)
                         com_pos = []
                         continue
                     ## we store all atoms in solvated form but return only the dry positions
-                    yield com_pos[:num_atoms], frame
+                    if return_full:
+                        yield com_pos, frame
+                    else:
+                        yield com_pos[:num_atoms], frame
                     com_pos = []
 
     if p_counter != 0:
@@ -86,6 +90,27 @@ def store_frame_inpcrd(coords, per_line = 6, fp = './complex.inpcrd'):
 
     f.close()
 
+def store_single_frame_mdcrd(coords, per_line = 10, fp = './single.mdcrd'):
+    try:
+        f = open(fp, 'w')
+    except:
+        raise FilePermission("To store inpcrd frames, the program needs to have access to %s" % fp)
+
+    f.write('\n')
+
+    counter_p = 0 # counts number of positions already written in a line
+
+    for coordMD in coords:
+        for coord1D in coordMD:
+            if coord1D < 0:
+                f.write(' ' + add_zeros(np.around(coord1D, 3)))
+            else:
+                f.write('  ' + add_zeros(np.around(coord1D, 3)))
+            counter_p += 1
+            if counter_p % per_line == 0:
+                f.write("\n")
+
+    f.close()
 def read_gbnsr6_output(path):
     f = open(path)
     lines = f.readlines()
