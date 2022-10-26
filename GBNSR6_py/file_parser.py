@@ -77,7 +77,7 @@ def store_frame_inpcrd(coords, per_line = 6, fp = './complex.inpcrd'):
         raise FilePermission("To store inpcrd frames, the program needs to have access to %s" % fp)
 
     f.write('default_name\n')
-    f.write('  ' + str(len(coords)) + '\n')
+    f.write(' ' + str(len(coords)) + '\n')
 
     counter_p = 0 # counts number of positions already written in a line
 

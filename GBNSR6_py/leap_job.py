@@ -23,7 +23,7 @@ class LEaP:
         f.write('set default PBRadii mbondi2\n')
         f.write('source leaprc.water.tip3p\n')
         f.write('com = loadpdb %s\n' % self.pdb_path)
-        f.write('saveamberparm com %s/com.prmtop %s/com.inpcrd\n' % (self.output_path, self.output_path))
+        f.write('saveamberparm com %s/complex.prmtop %s/com.inpcrd\n' % (self.output_path, self.output_path))
         f.write('solvatebox com TIP3PBOX 12.0\n')
         f.write('saveamberparm com %s/com_solvated.prmtop %s/com_solvated.inpcrd\n' % (self.output_path, self.output_path))
         f.write('quit')

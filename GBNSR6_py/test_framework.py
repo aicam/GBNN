@@ -9,22 +9,26 @@ AMBERHOME = os.environ['AMBERHOME'] #'/home/ali/Amber/amber22'
 print(AMBERHOME, " Variable is set")
 
 mdcrd_files = []
-for x in sorted(os.listdir()):
-    if x.endswith(".mdcrd"):
+num_atoms = 12515
+num_solvated = 12515
+split_index = 9522
+skip = 1
+traj_path = "./prods"
+traj_type = ".crd"
+
+for x in sorted(os.listdir(traj_path)):
+    if x.endswith(traj_type):
         mdcrd_files.append(x)
 
-num_atoms = 3862
-num_solvated = 42193
-skip = 1
 
 total_number_frames = 0
 
 all_records_gbnsr6 = []
 
 for mdcrd_file in mdcrd_files:
-    mdcrd = open(mdcrd_file, 'r')
+    mdcrd = open(traj_path + '/' + mdcrd_file, 'r')
     lines = mdcrd.readlines()
-    g = parse_traj(lines, num_atoms, num_solvated, skip=skip)
+    g = parse_traj(lines, num_atoms, num_solvated, skip=skip, return_full=True)
 
     for fr in g:
         gbnsr6 = {}
@@ -34,8 +38,10 @@ for mdcrd_file in mdcrd_files:
         subprocess.run(['rm', 'complex.inpcrd'])
         subprocess.run(['rm', 'mdout'])
         store_frame_inpcrd(fr[0])
+        print("Frame ", total_number_frames, " stored with len ", len(fr[0]))
+        print("Running GBNSR6 on complex")
         subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'com.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', './prods/6m0j.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
         new_res = read_gbnsr6_output('mdout')
         gbnsr6['complex_Etot'] = new_res['Etot']
         gbnsr6['complex_EKtot'] = new_res['EKtot']
@@ -47,9 +53,10 @@ for mdcrd_file in mdcrd_files:
         # receptor
         subprocess.run(['rm', 'complex.inpcrd'])
         subprocess.run(['rm', 'mdout'])
-        store_frame_inpcrd(fr[0][:2621])
+        store_frame_inpcrd(fr[0][:split_index])
+        print("Running GBNSR6 on receptor")
         subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'ras.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'prods/receptor.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
         new_res = read_gbnsr6_output('mdout')
         gbnsr6['receptor_Etot'] = new_res['Etot']
         gbnsr6['receptor_EKtot'] = new_res['EKtot']
@@ -61,9 +68,10 @@ for mdcrd_file in mdcrd_files:
         # ligand
         subprocess.run(['rm', 'complex.inpcrd'])
         subprocess.run(['rm', 'mdout'])
-        store_frame_inpcrd(fr[0][2621:])
+        store_frame_inpcrd(fr[0][split_index:])
+        print("Running GBNSR6 on ligand")
         subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'raf.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'prods/sars2.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
         new_res = read_gbnsr6_output('mdout')
         gbnsr6['ligand_Etot'] = new_res['Etot']
         gbnsr6['ligand_EKtot'] = new_res['EKtot']
