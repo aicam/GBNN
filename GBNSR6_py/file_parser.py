@@ -67,8 +67,8 @@ def parse_traj(lines, num_atoms, num_total, mod = 3, skip = 1, end_frame = 9999,
                         yield com_pos[:num_atoms], frame
                     com_pos = []
 
-    if p_counter != 0:
-        warnings.warn("Number of positions was not as expected, remained (%d)" % p_counter, PoistionsNumberWarning)
+    # if p_counter != 0:
+    #     warnings.warn("Number of positions was not as expected, remained (%d)" % p_counter, PoistionsNumberWarning)
 
 def store_frame_inpcrd(coords, per_line = 6, fp = './complex.inpcrd'):
     try:
@@ -77,7 +77,8 @@ def store_frame_inpcrd(coords, per_line = 6, fp = './complex.inpcrd'):
         raise FilePermission("To store inpcrd frames, the program needs to have access to %s" % fp)
 
     f.write('default_name\n')
-    f.write(' ' + str(len(coords)) + '\n')
+    white_spaces = ''.join([' ' for i in range(6 - len(coords))])
+    f.write(white_spaces + str(len(coords)) + '\n')
 
     counter_p = 0 # counts number of positions already written in a line
 
@@ -140,3 +141,29 @@ def read_gbnsr6_output(path):
     result['ESURF'] = get_numbers(l.split('=')[1])[0]
 
     return result
+
+## TODO: check consistency of `FLAG POINTERS`
+def get_natom_topology(f):
+    lines = open(f, 'r').readlines()
+    natom = 0
+    for i in range(len(lines)):
+        if lines[i].__contains__('FLAG POINTERS'):
+            natom = get_numbers(lines[i + 2])[0]
+    return int(natom)
+
+def change_inp_endframe(i, fm = 'mmpbsa.in'):
+    new_lines=[]
+    for l in open(fm):
+        if l.__contains__('endframe'):
+            new_lines.append('   endframe=' + str(i) + ',\n')
+        elif l.__contains__('startframe'):
+            if i == 1:
+                new_lines.append('   startframe=1,\n')
+            else:
+                new_lines.append('   startframe=' + str(i - 1) + ',\n')
+        else:
+            new_lines.append(l)
+    f = open(fm, 'w')
+    for l in new_lines:
+        f.write(l)
+    f.close()
