@@ -21,6 +21,10 @@ group.add_argument('-cp', dest='complex_prmtop', metavar='<Topology File>',
                   default='complex_prmtop', help='''Topology file of the
                   bound complex (or the single system for 'stability'
                   calculations)''')
+group.add_argument('-is', dest='is_solvated', metavar='Bool',
+                  default=False, help='''Topology file of the
+                  bound complex (or the single system for 'stability'
+                  calculations)''')
 
-args = vars(parser.parse_args())
-print(args)
+# args = vars(parser.parse_args())
+# print(args)
