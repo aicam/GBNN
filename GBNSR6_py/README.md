@@ -9,7 +9,6 @@ Here we have internal development modules and functions to test the whole system
 ## Usage
 The basic usage of the library is to run main_test.py on a trajectory
 to compare the result of GBNSR6 with MMPBSA (igb=2).
-<br>
 ### Trajectory file
 The trajectory file should be in ASCII format. If you have
 run the simulation and generated the binary files, just 
@@ -42,3 +41,7 @@ Miscellaneous Options:
                         Trajectory files type
 
 ```
+## Running simulation
+You can run the simulation in both dry or solvated mode
+and specify -is in the program. It is recommended to run the simulation
+on solvated structure for more precise trajectory.
