@@ -10,7 +10,7 @@ print(AMBERHOME, " Variable is set")
 
 mdcrd_files = []
 num_atoms = 12515
-num_solvated = 12515
+num_solvated = 178721
 split_index = 9522
 skip = 1
 traj_path = "./prods"
@@ -19,16 +19,18 @@ traj_type = ".crd"
 for x in sorted(os.listdir(traj_path)):
     if x.endswith(traj_type):
         mdcrd_files.append(x)
-
+print("Trajectory files ", mdcrd_files)
 
 total_number_frames = 0
 
 all_records_gbnsr6 = []
 
 for mdcrd_file in mdcrd_files:
-    mdcrd = open(traj_path + '/' + mdcrd_file, 'r')
-    lines = mdcrd.readlines()
-    g = parse_traj(lines, num_atoms, num_solvated, skip=skip, return_full=True)
+    # mdcrd = open(traj_path + '/' + mdcrd_file, 'r')
+    # lines = mdcrd.readlines()
+    print("Reading trajectory files begin")
+    g = parse_traj(traj_path + '/' + mdcrd_file, num_atoms, num_solvated, skip=skip)
+    print("Reading trajectory files finished")
 
     for fr in g:
         gbnsr6 = {}
@@ -71,7 +73,7 @@ for mdcrd_file in mdcrd_files:
         store_frame_inpcrd(fr[0][split_index:])
         print("Running GBNSR6 on ligand")
         subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'prods/sars2.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'prods/SARS_CoV_2.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
         new_res = read_gbnsr6_output('mdout')
         gbnsr6['ligand_Etot'] = new_res['Etot']
         gbnsr6['ligand_EKtot'] = new_res['EKtot']
@@ -88,6 +90,7 @@ for mdcrd_file in mdcrd_files:
 
 with open('-'.join(mdcrd_files) + "_" + str(skip) + "_gbnsr6.pkl", 'wb') as handle:
     pickle.dump(all_records_gbnsr6, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    handle.close()
 
 # MMPBSA runner
 
@@ -108,23 +111,38 @@ def change_inp_endframe(i):
         f.write(l)
     f.close()
 
+all_records_mmgbsa = []
 all_records_mmpbsa = []
-
+mmgbsa_dic = {}
 mmpbsa_dic = {}
 for i in range(1, total_number_frames):
     print("End frame is (MMPBSA)" + str(i))
     change_inp_endframe(i)
     subprocess.run(['./run_mmpbsa.sh'])
     f = open('FINAL_RESULTS_MMPBSA.dat').readlines()
+
+    ## GB records
     gb = ''.join(f).split('GENERALIZED BORN:')[1].split('POISSON BOLTZMANN:')[0]
-    mmpbsa_dic = {}
-    mmpbsa_dic['meta'] = str(i)
+    mmgbsa_dic = {}
+    mmgbsa_dic['meta'] = str(i)
     for title in ['Complex', 'Receptor', 'Ligand']:
         for param in ['EEL', 'EGB', 'ESURF']:
-            mmpbsa_dic[title + '_' + param] = get_numbers(gb.split(title)[1].split('TOTAL')[0].split(param)[1].split('\n')[0])[0]
+            mmgbsa_dic[title + '_' + param] = get_numbers(gb.split(title)[1].split('TOTAL')[0].split(param)[1].split('\n')[0])[0]
+    all_records_mmgbsa.append(mmgbsa_dic)
+
+    ## PB records
+    pb = ''.join(f).split('POISSON BOLTZMANN:')[1].split('Differences (Complex - Receptor - Ligand):')[1]
+    mmpbsa_dic = {}
+    mmpbsa_dic['meta'] = str(i)
+    for param in ['EEL', 'EPB', 'ENPOLAR', 'EDISPER']:
+        mmpbsa_dic[param] = get_numbers(pb.split('DELTA G gas')[0].split(param)[1].split('\n')[0])[0]
     all_records_mmpbsa.append(mmpbsa_dic)
 
+with open('-'.join(mdcrd_files) + "_" + str(skip) + "_mmgbsa.pkl", 'wb') as handle:
+    pickle.dump(all_records_mmgbsa, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    handle.close()
 with open('-'.join(mdcrd_files) + "_" + str(skip) + "_mmpbsa.pkl", 'wb') as handle:
     pickle.dump(all_records_mmpbsa, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    handle.close()
 
 print("Total number of frames ", total_number_frames)

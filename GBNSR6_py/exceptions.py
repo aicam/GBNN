@@ -31,3 +31,26 @@ class LEaPProgramFailed(GBNSR6_Error):
 class AMBERNOTFound(GBNSR6_Error):
     ''' $AMBERHOME is not defined '''
     pass
+
+class MMPBSA_Error(Exception):
+   """ Base MMPBSA error class """
+   def __init__(self, msg='MMPBSA error'):
+      self.msg = msg
+   def __str__(self):
+      return self.msg
+
+class TrajError(MMPBSA_Error):
+   """ Error in trajectory processing """
+   pass
+
+class InternalError(MMPBSA_Error):
+   """ Error from buggy coding """
+   pass
+
+class MutateError(MMPBSA_Error):
+   """ Error mutating a trajectory in alanine scanning """
+   pass
+
+class MutantResError(MutateError):
+   """ Error if we're mutating to a bad residue """
+   pass

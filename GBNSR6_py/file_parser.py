@@ -35,7 +35,7 @@ def parse_raw_inpcrd(lines, mod = 3, replacement ="\n", skip_first = 2, skip_las
         warnings.warn("Number of positions was not as expected, remained (%d)" % counter, PoistionsNumberWarning)
     return com_pos
 
-def parse_traj(lines, num_atoms, num_total, mod = 3, skip = 1, end_frame = 9999, return_full = False):
+def parse_traj(f, num_atoms, num_total, mod = 3, skip = 1, end_frame = 9999, return_full = False):
 
     com_pos = [] # complex position
     new_md = [] # each 3d (mod) position generated in each iteration
@@ -43,29 +43,30 @@ def parse_traj(lines, num_atoms, num_total, mod = 3, skip = 1, end_frame = 9999,
     skip_counter = 0 # skip frames based on skip in input
     frame = 0
 
-    # for each line of the lines
-    for l in lines:
-        # for each position of the line
-        for p in get_numbers(l):
-            new_md.append(p)
-            p_counter += 1
-            if p_counter % mod == 0:
-                com_pos.append(new_md)
-                p_counter = 0
-                new_md = []
-                if len(com_pos) == num_total:
-                    frame += 1
-                    if frame > end_frame:
-                        return
-                    if frame % skip != 0:
+    with open(f, 'r') as infile:
+        # for each line of the lines
+        for l in infile:
+            # for each position of the line
+            for p in get_numbers(l):
+                new_md.append(p)
+                p_counter += 1
+                if p_counter % mod == 0:
+                    com_pos.append(new_md)
+                    p_counter = 0
+                    new_md = []
+                    if len(com_pos) == num_total:
+                        frame += 1
+                        if frame > end_frame:
+                            return
+                        if frame % skip != 0:
+                            com_pos = []
+                            continue
+                        ## we store all atoms in solvated form but return only the dry positions
+                        if return_full:
+                            yield com_pos, frame
+                        else:
+                            yield com_pos[:num_atoms], frame
                         com_pos = []
-                        continue
-                    ## we store all atoms in solvated form but return only the dry positions
-                    if return_full:
-                        yield com_pos, frame
-                    else:
-                        yield com_pos[:num_atoms], frame
-                    com_pos = []
 
     # if p_counter != 0:
     #     warnings.warn("Number of positions was not as expected, remained (%d)" % p_counter, PoistionsNumberWarning)
