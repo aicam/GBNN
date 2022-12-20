@@ -84,6 +84,28 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
         return output
 
 
+class ConvLayer(tf.keras.Model):
+    def __init__(self, out_channel, num_features=40):
+        super(ConvLayer, self).__init__()
+        self.out_channel = out_channel
+        self.num_features = num_features
+        self.w = tf.Variable(tf.initializers.glorot_uniform()
+                             (shape=[num_features, out_channel]), shape=[num_features, out_channel], trainable=True)
+
+    def _call_single(self, inp):
+        features = inp[0]
+        out = [0] * self.out_channel
+        for feature in features:
+            feature = tf.reshape(feature, [1, -1])
+            out += tf.nn.softmax(tf.matmul(feature, self.w))
+        return tf.reshape(out, [-1])
+
+    def call(self, inputs):
+        output = []
+        for inp in inputs:
+            output.append(self._call_single(inp))
+        return output
+
 class GraphConvLayer(tf.keras.layers.Layer):
     def __init__(self,
                  out_channel,
@@ -95,7 +117,7 @@ class GraphConvLayer(tf.keras.layers.Layer):
         self.num_features = num_features
         self.activation_fn = activation_fn
         self.w_s = tf.Variable(initial_value=tf.initializers.glorot_uniform()
-        (shape=[num_features, out_channel]), shape=[num_features, out_channel], trainable=True)
+            (shape=[num_features, out_channel]), shape=[num_features, out_channel], trainable=True)
         self.w_n = tf.Variable(initial_value=tf.initializers.glorot_uniform()
         (shape=[num_features, out_channel]),
                                shape=[num_features, out_channel], trainable=True)
