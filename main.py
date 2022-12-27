@@ -8,8 +8,9 @@ x = np.ones((1, 8, 4, 3))
 import deepchem as dc
 dc.data.DiskDataset.from_numpy()
 from deepchem.feat import AtomicConvFeaturizer
-dc.feat.ConvMolFeaturizer
-
+dc.models.KerasModel
+from deepchem.feat.graph_features import atom_features
+dc.models.GraphConvModel
 model = tf.keras.models.Sequential()
 model.add(MMLayer())
 model.add(GBLayer())

@@ -2,7 +2,7 @@ import tensorflow as tf
 from deepchem.feat.mol_graphs import ConvMol
 
 from layers import *
-class PGGCN(tf.keras.Model):
+class PGGCNModel(tf.keras.Model):
     def __init__(self, num_atom_features = 80, r_out_channel = 40, c_out_channel = 1024):
         super().__init__()
         self.ruleGraphConvLayer = RuleGraphConvLayer(r_out_channel, num_atom_features)
@@ -14,7 +14,7 @@ class PGGCN(tf.keras.Model):
                  bias_initializer=tf.keras.initializers.Zeros(), activation=tf.keras.activations.relu)
 
     def set_physics_info(self, info):
-        self.physics_info = info
+        self.physics_info = info.reshape([-1, 15])
 
     def addRule(self, rule, start_index, end_index = None):
         self.ruleGraphConvLayer.addRule(rule, start_index, end_index)
@@ -24,8 +24,6 @@ class PGGCN(tf.keras.Model):
         x = self.conv(x)
         x = self.dense1(x)
         model_var = self.dense2(x)
-        print("model var shape ", model_var.shape)
         merged = tf.concat([model_var, self.physics_info], axis=1)
-        print("merged shape", merged.shape)
         out = self.dense3(merged)
         return out

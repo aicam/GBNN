@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+import numpy as np
 class RuleGraphConvLayer(tf.keras.layers.Layer):
     def __init__(self,
                  out_channel,
@@ -19,7 +19,6 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
         self.w_n = tf.Variable(initial_value=tf.initializers.glorot_uniform()
         (shape=[num_features + num_bond, out_channel]),
                                shape=[num_features + num_bond, out_channel], trainable=True)
-
     def AtomDistance(self, x, y):
         return tf.sqrt(tf.reduce_sum(tf.square(x - y)))
 
@@ -39,9 +38,9 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
             self.combination_rules.append([[start_index, end_index], rule])
 
     def _call_single(self, inp):
-        features = inp[0]
+        features = inp[0][0]
         adjacency_list = inp[1]
-        new_features = len(features) * [None]
+        new_features = len(features) * [0]
         for i, adj in enumerate(adjacency_list):
             self_features = tf.reshape(features[i], [1, self.num_features])
             self_conv_features = tf.matmul(self_features, self.w_s)
@@ -69,18 +68,21 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
                                                                       neighbour_features[indices[0]:indices[1]]))
                 new_ordered_features = tf.concat(new_ordered_features, axis=0)
                 if distance != None:
+                    distance = distance if distance >0 else 10e-3
                     new_ordered_features /= distance ** 2
                 new_ordered_features = tf.concat([new_ordered_features, neighbour_bond], axis=0)
                 new_ordered_features = tf.reshape(new_ordered_features, [1, self.num_features + self.num_bond])
 
                 new_features[i] += tf.matmul(new_ordered_features, self.w_n)
                 new_features[i] = new_features[i][0]
-        return ([tf.Variable(new_features, trainable=False), adjacency_list])
+
+        return new_features
 
     def call(self, inputs):
         output = []
         for inp in inputs:
-            output.append(self._call_single(inp))
+            ans = self._call_single(inp)
+            output.append(ans)
         return output
 
 
@@ -93,18 +95,18 @@ class ConvLayer(tf.keras.Model):
                              (shape=[num_features, out_channel]), shape=[num_features, out_channel], trainable=True)
 
     def _call_single(self, inp):
-        features = inp[0]
-        out = [0] * self.out_channel
-        for feature in features:
+        out = [0.0] * self.out_channel
+        for feature in inp:
             feature = tf.reshape(feature, [1, -1])
-            out += tf.nn.softmax(tf.matmul(feature, self.w))
+            feature = tf.cast(feature, 'float')
+            out += tf.nn.softmax(tf.matmul(feature, self.w))[0]
         return tf.reshape(out, [-1])
 
     def call(self, inputs):
         output = []
         for inp in inputs:
             output.append(self._call_single(inp))
-        return output
+        return tf.reshape(output, [len(inputs), -1])#np.array(output).reshape([len(inputs), -1])
 
 class GraphConvLayer(tf.keras.layers.Layer):
     def __init__(self,
