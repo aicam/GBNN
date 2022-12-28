@@ -19,6 +19,7 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
         self.w_n = tf.Variable(initial_value=tf.initializers.glorot_uniform()
         (shape=[num_features + num_bond, out_channel]),
                                shape=[num_features + num_bond, out_channel], trainable=True)
+
     def AtomDistance(self, x, y):
         return tf.sqrt(tf.reduce_sum(tf.square(x - y)))
 
@@ -38,9 +39,9 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
             self.combination_rules.append([[start_index, end_index], rule])
 
     def _call_single(self, inp):
-        features = inp[0][0]
+        features = inp[0]
         adjacency_list = inp[1]
-        new_features = len(features) * [0]
+        new_features = len(features) * [None]
         for i, adj in enumerate(adjacency_list):
             self_features = tf.reshape(features[i], [1, self.num_features])
             self_conv_features = tf.matmul(self_features, self.w_s)

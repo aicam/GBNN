@@ -10,7 +10,7 @@ dc.data.DiskDataset.from_numpy()
 from deepchem.feat import AtomicConvFeaturizer
 dc.models.KerasModel
 from deepchem.feat.graph_features import atom_features
-dc.models.GraphConvModel
+dc.models.layers.GraphConv
 model = tf.keras.models.Sequential()
 model.add(MMLayer())
 model.add(GBLayer())
