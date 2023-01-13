@@ -26,7 +26,7 @@ onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
 host_name = [x for x in onlyfiles if x.__contains__('host')][0]
 host_mol = rdkit.Chem.rdmolfiles.MolFromPDBFile(mypath + '/' + host_name)
 onlyfiles.remove(host_name)
-for f in onlyfiles[:3]:
+for f in onlyfiles:
     guest_mol = rdkit.Chem.rdmolfiles.MolFromPDBFile(mypath + '/' + f)
     PDBs.update({f.split('.')[0] : rdkit.Chem.CombineMols(host_mol,guest_mol)})
 
@@ -66,7 +66,6 @@ for pdb in list(PDBs.keys()):
 info = np.array(info)
 
 import layers
-import importlib
 
 
 class PGGCNModel(tf.keras.Model):
@@ -81,11 +80,11 @@ class PGGCNModel(tf.keras.Model):
         # self.dense4 = tf.keras.layers.Dense(150, activation='relu')
         # self.dense5 = tf.keras.layers.Dense(50, activation='relu')
         self.dense6 = tf.keras.layers.Dense(1)
-        # self.dense7 = tf.keras.layers.Dense(1,
-        #                                     kernel_initializer=tf.keras.initializers.Constant(
-        #                                         [.5, -1, -1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1]),
-        #                                     bias_initializer=tf.keras.initializers.Zeros(),
-        #                                     activation=tf.keras.activations.relu)
+        self.dense7 = tf.keras.layers.Dense(1,
+                                            kernel_initializer=tf.keras.initializers.Constant(
+                                                [.5, -1, -1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1]),
+                                            bias_initializer=tf.keras.initializers.Zeros(),
+                                            activation=tf.keras.activations.relu)
 
     def set_physics_info(self, info):
         self.physics_info = info.reshape([-1, 15])
@@ -120,9 +119,9 @@ class PGGCNModel(tf.keras.Model):
         # x = self.dense4(x)
         # x = self.dense5(x)
         model_var = self.dense6(x)
-        # merged = tf.concat([model_var, self.physics_info], axis=1)
-        # out = self.dense7(merged)
-        return model_var
+        merged = tf.concat([model_var, self.physics_info], axis=1)
+        out = self.dense7(merged)
+        return out
 
 
 m = PGGCNModel()
