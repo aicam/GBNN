@@ -9,8 +9,10 @@ import deepchem as dc
 dc.data.DiskDataset.from_numpy()
 from deepchem.feat import AtomicConvFeaturizer
 dc.models.KerasModel
+dc.feat.mol_graphs
 from deepchem.feat.graph_features import atom_features
 dc.models.layers.GraphConv
+dc.feat.ConvMolFeaturizer
 model = tf.keras.models.Sequential()
 model.add(MMLayer())
 model.add(GBLayer())

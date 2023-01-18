@@ -75,11 +75,11 @@ class PGGCNModel(tf.keras.Model):
         self.ruleGraphConvLayer.combination_rules = []
         self.conv = layers.ConvLayer(c_out_channel)
         self.dense1 = tf.keras.layers.Dense(300, activation='sigmoid')
-        self.dense2 = tf.keras.layers.Dense(450, activation='sigmoid')
-        self.dense3 = tf.keras.layers.Dense(250, activation='sigmoid')
+        self.dense2 = tf.keras.layers.Dense(100, activation='sigmoid')
+        self.dense3 = tf.keras.layers.Dense(20, activation='softmax')
         # self.dense4 = tf.keras.layers.Dense(150, activation='relu')
         # self.dense5 = tf.keras.layers.Dense(50, activation='relu')
-        self.dense6 = tf.keras.layers.Dense(1)
+        self.dense6 = tf.keras.layers.Dense(1, activation='relu')
         self.dense7 = tf.keras.layers.Dense(1,
                                             kernel_initializer=tf.keras.initializers.Constant(
                                                 [.5, -1, -1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1]),
