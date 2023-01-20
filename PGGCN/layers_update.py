@@ -70,55 +70,51 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
         new_features = tf.reshape(self_conv_features.stack(), (features.get_shape()[0], self.out_channel))
 
         ## Neighbours part
-        adj_dict = {}
-        adj_indices = [tf.constant(i).ref() for i in range(len(adjacency_list))]
-        for i, adj in enumerate(adjacency_list):
-            adj_dict[adj_indices[i]] = adj
         def neighbour_weight_mul():
             i = tf.constant(0)
-            nei_conv_features = tf.TensorArray(size=self.out_channel, dynamic_size=True, dtype=tf.float32)
+            nei_conv_features = tf.TensorArray(size=features.get_shape()[0], dynamic_size=True, dtype=tf.float32)
 
-            c = lambda i, nei_conv_features: tf.less(i, features.shape[0])
+            c = lambda i, nei_conv_features: tf.less(i, features.get_shape()[0])
 
             def b(i, nei_conv_features):
-                new_ordered_features = tf.TensorArray(size=self.out_channel, dynamic_size=True, dtype=tf.float32, clear_after_read=False, infer_shape=False)
+                new_ordered_features = tf.TensorArray(size=features.get_shape()[0], dynamic_size=True, dtype=tf.float32, clear_after_read=False, infer_shape=False)
                 distance = -1.
-                adj_atom = tf.numpy_function(lambda x: adjacency_list[x], [i], tf.int32)
-                for neighbour in adj_atom:
-                    self_features = tf.reshape(features[i], [1, self.num_features])
+                # for v in [[adjacency_list[i][0], adjacency_list[i][1:23]], [adjacency_list[i][23], adjacency_list[i][24:]]]:
+                self_features = tf.reshape(features[i], [1, self.num_features])
+                for v in range(2):
                     for j, rule in enumerate(self.combination_rules):
                         if j == len(self.combination_rules) - 1 and len(rule[0]) == 1:
                             new_ordered_features.write(j, rule[1](self_features[0][rule[0][0]:],
-                                                                  features[neighbour[0]][rule[0][0]:]))
+                                                                  features[tf.cast(adjacency_list[i][v*23], tf.int32)][rule[0][0]:]))
                         else:
                             if rule[1] == 'distance':
                                 distance = self.AtomDistance(x=self_features[0][rule[0][0]:rule[0][1]],
-                                                             y=features[neighbour[0]][rule[0][0]:rule[0][1]])
-                                new_ordered_features.write(j, features[neighbour[0]][rule[0][0]:rule[0][1]])
+                                                             y=features[tf.cast(adjacency_list[i][v*23], tf.int32)][rule[0][0]:rule[0][1]])
+                                new_ordered_features.write(j, features[tf.cast(adjacency_list[i][v*23], tf.int32)][rule[0][0]:rule[0][1]])
                             else:
+                                # print(tf.cast(adjacency_list[i][v*23], tf.int32))
                                 new_ordered_features.write(j, rule[1](self_features[0][rule[0][0]:rule[0][1]],
-                                                                      features[neighbour[0]][rule[0][0]:rule[0][1]]))
+                                                                      features[tf.cast(adjacency_list[i][v*23], tf.int32)][rule[0][0]:rule[0][1]]))
                     new_ordered_features_tensor = tf.concat([new_ordered_features.read(k) for k in range(len(self.combination_rules))], axis=0)
                     if distance != -1.:
                         distance = distance if distance > 0 else 10e-3
                         new_ordered_features_tensor /= distance ** 2
                     nei_conv_features.write(i,
-                        tf.add(
-                            tf.matmul(
-                                tf.reshape(
-                                    tf.concat(
-                                        [new_ordered_features_tensor, tf.cast(neighbour[1], dtype=tf.float32)],
-                                    axis=0),
-                                [1, self.num_features + self.num_bond]),
-                            self.w_n),
-                        new_features[i])
-                    )
+                                            tf.add(
+                                                tf.matmul(
+                                                    tf.reshape(
+                                                        tf.concat(
+                                                            [new_ordered_features_tensor, tf.cast(adjacency_list[i][1 + v*23:23*(v + 1)], dtype=tf.float32)],
+                                                            axis=0),
+                                                        [1, self.num_features + self.num_bond]),
+                                                    self.w_n),
+                                                new_features[i])
+                                            )
 
                 return i + 1, nei_conv_features
             return tf.while_loop(c, b, loop_vars=[i, nei_conv_features])
 
         neighbor_conv_features = neighbour_weight_mul()[1]
-
         # self.self_conv_features = self.self_conv_features[1:]
         neighbor_conv_features = tf.reshape(neighbor_conv_features.stack(), (features.get_shape()[0], self.out_channel))
         return neighbor_conv_features
