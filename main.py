@@ -21,6 +21,6 @@ model.add(tf.keras.layers.Conv2D(4, (2, 2)))
 model.add(tf.keras.layers.Flatten())
 model.add(tf.keras.layers.Dense(1, activation='relu'))
 model.compile(loss='MSE', optimizer='adam')
-
+from deepchem.feat.graph_features import atom_features
 from deepchem.metrics import to_one_hot
 from deepchem.models.layers import GraphConv, GraphPool, GraphGather

@@ -52,47 +52,9 @@ def atom_features(atom,
         'O',
         'S',
         'F',
-        'Si',
-        'P',
-        'Cl',
-        'Br',
-        'Mg',
-        'Na',
-        'Ca',
-        'Fe',
-        'As',
-        'Al',
-        'I',
-        'B',
-        'V',
-        'K',
-        'Tl',
-        'Yb',
-        'Sb',
-        'Sn',
-        'Ag',
-        'Pd',
-        'Co',
-        'Se',
-        'Ti',
-        'Zn',
-        'H',  # H?
-        'Li',
-        'Ge',
-        'Cu',
-        'Au',
-        'Ni',
-        'Cd',
-        'In',
-        'Mn',
-        'Zr',
-        'Cr',
-        'Pt',
-        'Hg',
-        'Pb',
         'Unknown'
       ]) + one_of_k_encoding(atom.GetDegree(),
-                             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) + \
+                             [0, 1, 2, 3, 4]) + \
               one_of_k_encoding_unk(atom.GetImplicitValence(), [0, 1, 2, 3, 4, 5, 6]) + \
               [atom.GetFormalCharge(), atom.GetNumRadicalElectrons()] + \
               one_of_k_encoding_unk(atom.GetHybridization(), [
@@ -112,7 +74,6 @@ def atom_features(atom,
       except:
         results = results + [False, False
                             ] + [atom.HasProp('_ChiralityPossible')]
-    results +=
 
     return np.array(results)
 
