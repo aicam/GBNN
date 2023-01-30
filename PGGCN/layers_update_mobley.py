@@ -41,8 +41,7 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
             self.combination_rules.append([[start_index, end_index], rule])
 
     def _call_single(self, inp):
-        features = inp[0]
-        adjacency_list = inp[1]
+        features = inp
 
         # self.counter1.assign(0)
         # self.self_conv_features.assign(np.array([0.0 for _ in range(self.out_channel)]).reshape([1, self.out_channel]))
@@ -55,7 +54,7 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
             # body
             def b(i, self_conv_features):
                 self_conv_features = self_conv_features.write(i, tf.matmul(
-                    tf.reshape(features[i], [1, self.num_features]),
+                    tf.reshape(features[i][:self.num_features], [1, self.num_features]),
                     self.w_s
                 ))
                 return i + 1, self_conv_features
@@ -77,28 +76,28 @@ class RuleGraphConvLayer(tf.keras.layers.Layer):
                                                       clear_after_read=False, infer_shape=False)
                 distance = -1.
                 # for v in [[adjacency_list[i][0], adjacency_list[i][1:23]], [adjacency_list[i][23], adjacency_list[i][24:]]]:
-                self_features = tf.reshape(features[i], [1, self.num_features])
+                self_features = tf.reshape(features[i][:self.num_features], [1, self.num_features])
                 for v in range(2):
-                    if tf.cast(adjacency_list[i][v * 23], tf.int32) == 0:
+                    if tf.cast(features[i][self.num_features + v], tf.int32) == 0:
                         continue
                     for j, rule in enumerate(self.combination_rules):
                         if j == len(self.combination_rules) - 1 and len(rule[0]) == 1:
                             new_ordered_features.write(j, rule[1](self_features[0][rule[0][0]:],
                                                                   features[
-                                                                      tf.cast(adjacency_list[i][v * 23], tf.int32)][
+                                                                      tf.cast(features[i][self.num_features + v], tf.int32)][
                                                                   rule[0][0]:]))
                         else:
                             if rule[1] == 'distance':
                                 distance = self.AtomDistance(x=self_features[0][rule[0][0]:rule[0][1]],
-                                                             y=features[tf.cast(adjacency_list[i][v * 23], tf.int32)][
+                                                             y=features[tf.cast(features[i][self.num_features + v], tf.int32)][
                                                                rule[0][0]:rule[0][1]])
-                                new_ordered_features.write(j, features[tf.cast(adjacency_list[i][v * 23], tf.int32)][
+                                new_ordered_features.write(j, features[tf.cast(features[i][self.num_features + v], tf.int32)][
                                                               rule[0][0]:rule[0][1]])
                             else:
                                 # print(tf.cast(adjacency_list[i][v*23], tf.int32))
                                 new_ordered_features.write(j, rule[1](self_features[0][rule[0][0]:rule[0][1]],
                                                                       features[
-                                                                          tf.cast(adjacency_list[i][v * 23], tf.int32)][
+                                                                          tf.cast(features[i][self.num_features + v], tf.int32)][
                                                                       rule[0][0]:rule[0][1]]))
                     new_ordered_features_tensor = tf.concat(
                         [new_ordered_features.read(k) for k in range(len(self.combination_rules))], axis=0)
