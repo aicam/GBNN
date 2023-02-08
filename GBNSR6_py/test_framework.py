@@ -9,12 +9,12 @@ AMBERHOME = os.environ['AMBERHOME'] #'/home/ali/Amber/amber22'
 print(AMBERHOME, " Variable is set")
 
 mdcrd_files = []
-num_atoms = 12515
-num_solvated = 178721
-split_index = 9522
+num_atoms = 3862
+num_solvated = 42193
+split_index = 2621
 skip = 1
-traj_path = "./prods"
-traj_type = ".crd"
+traj_path = "./"
+traj_type = ".mdcrd"
 
 for x in sorted(os.listdir(traj_path)):
     if x.endswith(traj_type):
@@ -43,7 +43,7 @@ for mdcrd_file in mdcrd_files:
         print("Frame ", total_number_frames, " stored with len ", len(fr[0]))
         print("Running GBNSR6 on complex")
         subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', './prods/6m0j.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'ras-raf.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
         new_res = read_gbnsr6_output('mdout')
         gbnsr6['complex_Etot'] = new_res['Etot']
         gbnsr6['complex_EKtot'] = new_res['EKtot']
@@ -58,7 +58,7 @@ for mdcrd_file in mdcrd_files:
         store_frame_inpcrd(fr[0][:split_index])
         print("Running GBNSR6 on receptor")
         subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'prods/receptor.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'ras.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
         new_res = read_gbnsr6_output('mdout')
         gbnsr6['receptor_Etot'] = new_res['Etot']
         gbnsr6['receptor_EKtot'] = new_res['EKtot']
@@ -73,7 +73,7 @@ for mdcrd_file in mdcrd_files:
         store_frame_inpcrd(fr[0][split_index:])
         print("Running GBNSR6 on ligand")
         subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'prods/SARS_CoV_2.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'raf.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
         new_res = read_gbnsr6_output('mdout')
         gbnsr6['ligand_Etot'] = new_res['Etot']
         gbnsr6['ligand_EKtot'] = new_res['EKtot']
@@ -110,6 +110,40 @@ def change_inp_endframe(i):
     for l in new_lines:
         f.write(l)
     f.close()
+def get_numbers(line, limit = -1):
+    new_digit = ''
+    numbers = []
+    is_neg = False
+    for i in range(len(line)):
+        c = line[i]
+        if i < len(line) - 1 and c == '-' and line[i + 1].isdigit():
+            is_neg = True
+        if c.isdigit() or (c == '.' and new_digit != ''):
+            new_digit += c
+        if new_digit != '' and c != '.' and (i == len(line) - 1 or not c.isdigit()):
+            new_num = float(new_digit)
+            new_num = -new_num if is_neg else new_num
+            numbers.append(new_num)
+            if len(numbers) == limit:
+                return numbers
+            new_digit = ''
+    return numbers
+def serializer(mod, f, separator_begin, separator_end):
+    data = ''.join(f).split(separator_begin)[1].split(separator_end)[0]
+    data_dic = {}
+    common_params = []
+    if mod == 'gb':
+        common_params = ['EEL', 'EGB', 'ESURF']
+    if mod == 'pb':
+        common_params = ['EEL', 'EPB', 'ENPOLAR', 'EDISPER', 'VDWAALS']
+    # all
+    for title in ['Complex', 'Receptor', 'Ligand', 'Differences (Complex - Receptor - Ligand)']:
+        for param in common_params:
+            data_dic[title + '_' + param] = get_numbers(data.split(title)[1].split('TOTAL')[0].split(param)[1].split('\n')[0])[0]
+        if title == 'Differences (Complex - Receptor - Ligand)':
+            for param in ['DELTA G gas', 'DELTA G solv', 'DELTA TOTAL'] + common_params:
+                data_dic[title + '_' + param] = get_numbers(data.split(title)[1].split(param)[1].split('\n')[0])[0]
+    return data_dic
 
 all_records_mmgbsa = []
 all_records_mmpbsa = []
@@ -122,21 +156,10 @@ for i in range(1, total_number_frames):
     f = open('FINAL_RESULTS_MMPBSA.dat').readlines()
 
     ## GB records
-    gb = ''.join(f).split('GENERALIZED BORN:')[1].split('POISSON BOLTZMANN:')[0]
-    mmgbsa_dic = {}
-    mmgbsa_dic['meta'] = str(i)
-    for title in ['Complex', 'Receptor', 'Ligand']:
-        for param in ['EEL', 'EGB', 'ESURF']:
-            mmgbsa_dic[title + '_' + param] = get_numbers(gb.split(title)[1].split('TOTAL')[0].split(param)[1].split('\n')[0])[0]
-    all_records_mmgbsa.append(mmgbsa_dic)
+    all_records_mmgbsa.append(serializer('gb', f, 'GENERALIZED BORN:', 'POISSON BOLTZMANN:'))
 
     ## PB records
-    pb = ''.join(f).split('POISSON BOLTZMANN:')[1].split('Differences (Complex - Receptor - Ligand):')[1]
-    mmpbsa_dic = {}
-    mmpbsa_dic['meta'] = str(i)
-    for param in ['EEL', 'EPB', 'ENPOLAR', 'EDISPER']:
-        mmpbsa_dic[param] = get_numbers(pb.split('DELTA G gas')[0].split(param)[1].split('\n')[0])[0]
-    all_records_mmpbsa.append(mmpbsa_dic)
+    all_records_mmpbsa.append(serializer('pb', f, 'POISSON BOLTZMANN:', '-------------------------------------------------------------------------------\n-------------------------------------------------------------------------------'))
 
 with open('-'.join(mdcrd_files) + "_" + str(skip) + "_mmgbsa.pkl", 'wb') as handle:
     pickle.dump(all_records_mmgbsa, handle, protocol=pickle.HIGHEST_PROTOCOL)
