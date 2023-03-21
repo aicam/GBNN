@@ -27,78 +27,78 @@ total_number_frames = 0
 
 all_records_gbnsr6 = []
 gbnsr6_frame_times = []
-
-for mdcrd_file in mdcrd_files:
-    # mdcrd = open(traj_path + '/' + mdcrd_file, 'r')
-    # lines = mdcrd.readlines()
-    print("Reading trajectory files begin")
-    g = parse_traj(traj_path + '/' + mdcrd_file, num_atoms, num_solvated, skip=skip)
-    print("Reading trajectory files finished")
-
-    for fr in g:
-        gbnsr6 = {}
-        gbnsr6['meta'] = mdcrd_file + "_" + str(fr[1])
-
-        # complex
-        subprocess.run(['rm', 'complex.inpcrd'])
-        subprocess.run(['rm', 'mdout'])
-        store_frame_inpcrd(fr[0])
-        print("Frame ", total_number_frames, " stored with len ", len(fr[0]))
-        print("Running GBNSR6 on complex")
-        time_start = time.time()
-        subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'ras-raf.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
-        gbnsr6_frame_times.append(time.time() - time_start)
-        new_res = read_gbnsr6_output('mdout')
-        gbnsr6['complex_Etot'] = new_res['Etot']
-        gbnsr6['complex_EKtot'] = new_res['EKtot']
-        gbnsr6['complex_EPtot'] = new_res['EPtot']
-        gbnsr6['complex_EELEC'] = new_res['EELEC']
-        gbnsr6['complex_EGB'] = new_res['EGB']
-        gbnsr6['complex_ESURF'] = new_res['ESURF']
-
-        # receptor
-        subprocess.run(['rm', 'complex.inpcrd'])
-        subprocess.run(['rm', 'mdout'])
-        store_frame_inpcrd(fr[0][:split_index])
-        print("Running GBNSR6 on receptor")
-        subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'ras.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
-        new_res = read_gbnsr6_output('mdout')
-        gbnsr6['receptor_Etot'] = new_res['Etot']
-        gbnsr6['receptor_EKtot'] = new_res['EKtot']
-        gbnsr6['receptor_EPtot'] = new_res['EPtot']
-        gbnsr6['receptor_EELEC'] = new_res['EELEC']
-        gbnsr6['receptor_EGB'] = new_res['EGB']
-        gbnsr6['receptor_ESURF'] = new_res['ESURF']
-
-        # ligand
-        subprocess.run(['rm', 'complex.inpcrd'])
-        subprocess.run(['rm', 'mdout'])
-        store_frame_inpcrd(fr[0][split_index:])
-        print("Running GBNSR6 on ligand")
-        subprocess.run(
-            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'raf.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
-        new_res = read_gbnsr6_output('mdout')
-        gbnsr6['ligand_Etot'] = new_res['Etot']
-        gbnsr6['ligand_EKtot'] = new_res['EKtot']
-        gbnsr6['ligand_EPtot'] = new_res['EPtot']
-        gbnsr6['ligand_EELEC'] = new_res['EELEC']
-        gbnsr6['ligand_EGB'] = new_res['EGB']
-        gbnsr6['ligand_ESURF'] = new_res['ESURF']
-
-        all_records_gbnsr6.append(gbnsr6)
-        total_number_frames += 1
-
-        print(str(total_number_frames) + " (GBNSR6) Finished")
-
-
-with open("gbnsr6_frame_times.pkl", 'wb') as handle:
-    pickle.dump(gbnsr6_frame_times, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    handle.close()
-with open('-'.join(mdcrd_files) + "_" + str(skip) + "_gbnsr6.pkl", 'wb') as handle:
-    pickle.dump(all_records_gbnsr6, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    handle.close()
+#
+# for mdcrd_file in mdcrd_files:
+#     # mdcrd = open(traj_path + '/' + mdcrd_file, 'r')
+#     # lines = mdcrd.readlines()
+#     print("Reading trajectory files begin")
+#     g = parse_traj(traj_path + '/' + mdcrd_file, num_atoms, num_solvated, skip=skip)
+#     print("Reading trajectory files finished")
+#
+#     for fr in g:
+#         gbnsr6 = {}
+#         gbnsr6['meta'] = mdcrd_file + "_" + str(fr[1])
+#
+#         # complex
+#         subprocess.run(['rm', 'complex.inpcrd'])
+#         subprocess.run(['rm', 'mdout'])
+#         store_frame_inpcrd(fr[0])
+#         print("Frame ", total_number_frames, " stored with len ", len(fr[0]))
+#         print("Running GBNSR6 on complex")
+#         time_start = time.time()
+#         subprocess.run(
+#             [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'ras-raf.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+#         gbnsr6_frame_times.append(time.time() - time_start)
+#         new_res = read_gbnsr6_output('mdout')
+#         gbnsr6['complex_Etot'] = new_res['Etot']
+#         gbnsr6['complex_EKtot'] = new_res['EKtot']
+#         gbnsr6['complex_EPtot'] = new_res['EPtot']
+#         gbnsr6['complex_EELEC'] = new_res['EELEC']
+#         gbnsr6['complex_EGB'] = new_res['EGB']
+#         gbnsr6['complex_ESURF'] = new_res['ESURF']
+#
+#         # receptor
+#         subprocess.run(['rm', 'complex.inpcrd'])
+#         subprocess.run(['rm', 'mdout'])
+#         store_frame_inpcrd(fr[0][:split_index])
+#         print("Running GBNSR6 on receptor")
+#         subprocess.run(
+#             [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'ras.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+#         new_res = read_gbnsr6_output('mdout')
+#         gbnsr6['receptor_Etot'] = new_res['Etot']
+#         gbnsr6['receptor_EKtot'] = new_res['EKtot']
+#         gbnsr6['receptor_EPtot'] = new_res['EPtot']
+#         gbnsr6['receptor_EELEC'] = new_res['EELEC']
+#         gbnsr6['receptor_EGB'] = new_res['EGB']
+#         gbnsr6['receptor_ESURF'] = new_res['ESURF']
+#
+#         # ligand
+#         subprocess.run(['rm', 'complex.inpcrd'])
+#         subprocess.run(['rm', 'mdout'])
+#         store_frame_inpcrd(fr[0][split_index:])
+#         print("Running GBNSR6 on ligand")
+#         subprocess.run(
+#             [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', 'raf.prmtop', '-c', 'complex.inpcrd', '-i', 'gbnsr6.in'])
+#         new_res = read_gbnsr6_output('mdout')
+#         gbnsr6['ligand_Etot'] = new_res['Etot']
+#         gbnsr6['ligand_EKtot'] = new_res['EKtot']
+#         gbnsr6['ligand_EPtot'] = new_res['EPtot']
+#         gbnsr6['ligand_EELEC'] = new_res['EELEC']
+#         gbnsr6['ligand_EGB'] = new_res['EGB']
+#         gbnsr6['ligand_ESURF'] = new_res['ESURF']
+#
+#         all_records_gbnsr6.append(gbnsr6)
+#         total_number_frames += 1
+#
+#         print(str(total_number_frames) + " (GBNSR6) Finished")
+#
+#
+# with open("gbnsr6_frame_times.pkl", 'wb') as handle:
+#     pickle.dump(gbnsr6_frame_times, handle, protocol=pickle.HIGHEST_PROTOCOL)
+#     handle.close()
+# with open('-'.join(mdcrd_files) + "_" + str(skip) + "_gbnsr6.pkl", 'wb') as handle:
+#     pickle.dump(all_records_gbnsr6, handle, protocol=pickle.HIGHEST_PROTOCOL)
+#     handle.close()
 
 # MMPBSA runner
 
@@ -158,7 +158,7 @@ all_records_mmpbsa = []
 mmpbsa_frame_times = []
 mmgbsa_dic = {}
 mmpbsa_dic = {}
-for i in range(1, total_number_frames):
+for i in range(1, 200): #total_number_frames):
     print("End frame is (MMPBSA)" + str(i))
     change_inp_endframe(i)
     time_start = time.time()
