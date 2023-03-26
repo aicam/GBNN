@@ -1,0 +1,10 @@
+CBClip--CBC-G1, -5.83
+CBClip--CBC-G2, -2.51
+CBClip--CBC-G3, -4.02
+CBClip--CBC-G4, -7.24
+CBClip--CBC-G5, -8.53
+CBClip--CBC-G6, -8.64
+CBClip--CBC-G7, -5.17
+CBClip--CBC-G8, -6.17
+CBClip--CBC-G9, -7.39
+CBClip--CBC-G10, -10.35

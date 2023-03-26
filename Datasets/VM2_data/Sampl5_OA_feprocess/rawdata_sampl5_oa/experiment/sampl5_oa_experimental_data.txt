@@ -1,0 +1,12 @@
+OAH--OA-G1, -5.04
+OAH--OA-G2, -4.25
+OAH--OA-G3, -5.06
+OAH--OA-G4, -9.37
+OAH--OA-G5, -4.50
+OAH--OA-G6, -5.33
+OAMe--OA-G1, -5.24
+OAMe--OA-G2, -5.04
+OAMe--OA-G3, -5.94
+OAMe--OA-G4, -2.38
+OAMe--OA-G5, -3.90
+OAMe--OA-G6, -4.52

@@ -1,0 +1,73 @@
+Vconf v2.1 (win32) executed Wed Feb 27 13:58:19 2019
+
+----Working Directory --------
+
+C:\Users\mpotter\Dropbox\Sampl4
+
+----Command Line--------------
+
+C:\Program Files (x86)\VeraChem\Vconf_v2\Vconf C:\Users\mpotter\Dropbox\Sampl4\o1.mol -l 1 -out C:\Users\mpotter\Dropbox\Sampl4\o1_vconf.sdf -log C:\Users\mpotter\Dropbox\Sampl4\o1_vconf.log -ns 100 -minrs 50 -sw 0.5 -dc 4.0 -sr b -cp pbc -seed 9759 9850 7072 203 -maxrc 5 -re 1.0 -maxra 200 -e 5.0 -et 1.0 -dt 0.2 -at 30.0 -ts 120 -tf 120 -ff dreiding -addrs 200 -rl 1000 -sub u 
+
+----Files---------------------
+
+Source:         C:\Users\mpotter\Dropbox\Sampl4\o1.mol
+Log:            C:\Users\mpotter\Dropbox\Sampl4\o1_vconf.log
+Output:         C:\Users\mpotter\Dropbox\Sampl4\o1_vconf.sdf
+License:        None
+Stop file:      C:\Users\mpotter\Dropbox\Sampl4\o1_vconf.end
+
+----Calculation Parameters----
+
+First molecule to process:                         1
+Last molecule to process:                          1
+Mode:                                              search
+Number of tork searches per molecule:              100
+Solvation model:                                   None
+Forcefield:                                        Modified Dreiding
+Restrained atoms:                                  None
+Random number seeds:                               9759 9850 7072  203
+Search width:                                      0.50
+Assign formal charges?                             No
+Sulfonamide nitrogen conformation:                 planar
+Chiral priority settings:                          pbc
+Enforce input cis/trans config?                    Yes
+Enforce input atom chirality?                      Yes
+Dielectric coefficient:                            4.0  
+Add lone pairs to nitrogen:                        no
+Max resonance forms per generation:                1000
+First level substituents:                          United Atom
+Min search steps per fragment:                     50
+Max additional search steps per fragment:          250
+Max conformations per fragment:                    5
+Ring fragment size limit:                          200
+Ring energy cutoff (kcal/mol):                     1.0  
+Keep lowest energy ring combination:               yes
+Energy cutoff (kcal/mol):                          5.00 
+Energy tolerance (kcal/mol):                       1.00 
+Distance tolerance (Ang):                          0.20
+Angle/Dihedral tolerance (degree):                 30.0 
+Filter conformations?                              yes
+Molecule setup time limit (secs/mol):              120.0 
+Filtering time limit (secs/mol):                   120.0 
+Save unfiltered conformations?                     No
+
+----Results-------------------
+
+## molecule 1: o1_mol_1 (1 of 1, 100%)
+    Completed with no errors
+    Lowest energy found:        15.3  
+    Number of conformations:    1     
+    Search time (secs):         1.0   
+    Filter time (secs):         0.4   
+    The lowest energy conformation was found during the 3D building.
+    The last unique conformation was found during the 3D building.
+    90 percent of the unique conformations were found during the 3D building.
+
+----Summary-------------------
+    Total time (secs):                        1.0    
+    Average search time per molecule (secs):  1.0    
+    Number of conformational searches:        1      
+    Average of the lowest energies:           15.3   
+    Average number of filtered conformations: 1.0    
+    Percentage of molecules with errors:      0.0  %
+End of logfile

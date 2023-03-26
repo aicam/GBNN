@@ -1,0 +1,12 @@
+host1--guest1R, -5.84
+host1--guest1S, -5.84
+host1--guest2, -7.10
+host1--guest3, -6.80
+host1--guest4, -4.17
+host1--guest5, -6.06
+host1--guest6, -10.72
+host1--guest7, -7.85
+host2--guest8, -6.12
+host2--guest9, -7.43
+host3--guest8, -9.60
+host3--guest9, -8.99

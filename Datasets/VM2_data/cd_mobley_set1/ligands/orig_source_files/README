@@ -1,0 +1,18 @@
+The following errors present in the set of ligand sdf's from the Mobley dataset
+(see ./mobley_ligand_sdfs) must be corrected:
+
+1. No SDFile record separators present, so rename to .mol files.
+
+2. The format of the atom count line is incorrect.
+
+3. Formal charges are not provided and nonsensical bond orders are given for
+   carboxylate groups, making 5 coordinate carbon. 
+
+4. Missing parity in guest-s10, guest-s13, and guest-s15.
+
+
+These errors are fixed in ./fix_mobley_ligand_sdfs and the final corrected set
+of .mol files are present in ./fix_mobley_ligand_sdfs/4_fix_parity. These were
+copied into this directory and gathered together into an sdf:
+
+    ./cdset1_ligands.sdf

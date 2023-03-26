@@ -1,0 +1,15 @@
+a-cyclodex--benzene, -2.05
+a-cyclodex--flurbiprofen-ion, -2.36
+a-cyclodex--nabumetone, -2.13
+a-cyclodex--naproxen-ion, 0.0
+a-cyclodex--resorcinol, -1.65
+b-cyclodex--benzene, -3.04
+b-cyclodex--flurbiprofen-ion, -4.97
+b-cyclodex--nabumetone, -4.59
+b-cyclodex--naproxen-ion, -4.32
+b-cyclodex--resorcinol, -2.77
+g-cyclodex--benzene, -1.31
+g-cyclodex--flurbiprofen-ion, -4.75
+g-cyclodex--nabumetone, 0.0
+g-cyclodex--naproxen-ion, 0.0
+g-cyclodex--resorcinol, -1.84

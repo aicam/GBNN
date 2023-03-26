@@ -1,0 +1,14 @@
+ACX-representative.sdf, BCD-representative.sdf, RCD-representative.sdf Downloaded from:
+
+www.ebi.ac.uk/pdbe-srv/pdbechem/
+
+However, their chiral centers are incorrectly assigned, so they were not used as is.
+Instead, .sd files were generated using Discovery Studio Visualizer and the resulting files
+corrected to standard format for sdf/mol. These files were then renamed as:
+
+a-cyclodex.mol
+b-cyclodex.mol
+g-cyclodex.mol
+
+and these .mol files are gathered up into a single .sdf file for processing in the
+../prepareHosts directory.
