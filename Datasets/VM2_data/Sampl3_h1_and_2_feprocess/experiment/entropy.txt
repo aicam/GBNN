@@ -1,0 +1,4 @@
+host2--guest8, 2.38
+host2--guest9, -3.63
+host3--guest8, -2.4
+host3--guest9, -4.79
