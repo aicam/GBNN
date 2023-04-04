@@ -2,6 +2,8 @@ from GBModel.GB_Layers import MMLayer, GBLayer, FilterLayer
 import tensorflow as tf
 from deepchem.models.layers import GraphConv, GraphPool, GraphGather
 from keras.callbacks import EarlyStopping
+from rdkit import Chem
+Chem.MolFromPDBFile()
 import numpy as np
 from deepchem.feat.mol_graphs import ConvMol
 x = np.ones((1, 8, 4, 3))
@@ -10,6 +12,7 @@ dc.data.DiskDataset.from_numpy()
 from deepchem.feat import AtomicConvFeaturizer
 dc.models.KerasModel
 dc.feat.mol_graphs
+dc.models.KerasModel
 from deepchem.feat.graph_features import atom_features
 dc.models.layers.GraphConv
 dc.feat.ConvMolFeaturizer
