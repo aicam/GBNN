@@ -65,7 +65,7 @@ for pdb in list(PDBs.keys()):
     y.append(df[df['Guest'] == pdb.replace('-s', '-')]['EX _H_(kcal/mol)'].abs().to_numpy()[0])
 info = np.array(info)
 
-import layers
+from PGGCN.models import layers
 
 
 class PGGCNModel(tf.keras.Model):

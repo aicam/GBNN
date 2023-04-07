@@ -1,7 +1,3 @@
-import tensorflow as tf
-from deepchem.feat.mol_graphs import ConvMol
-
-from layers import *
 class PGGCNModel(tf.keras.Model):
     def __init__(self, num_atom_features = 80, r_out_channel = 40, c_out_channel = 1024):
         super().__init__()

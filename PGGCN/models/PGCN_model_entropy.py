@@ -1,4 +1,4 @@
-import layers_update_mobley as layers
+from . import layers_update_mobley as layers
 import importlib
 import keras.backend as K
 import numpy as np
@@ -50,7 +50,7 @@ def pure_rmse(y_true, y_pred):
     return K.sqrt(K.mean(K.square(y_pred - y_true)))
 
 
-def get_trained_model(X_train, y_train, epochs = 1, max_num_atoms = 2000, n_features = 41):
+def get_trained_model(X, y, epochs = 1, max_num_atoms = 2000, n_features = 41):
     m = PGGCNModel()
     m.addRule("sum", 0, 31)
     m.addRule("multiply", 31, 33)
@@ -59,15 +59,15 @@ def get_trained_model(X_train, y_train, epochs = 1, max_num_atoms = 2000, n_feat
     m.compile(loss=pure_rmse, optimizer='adam')
 
     input_shapes = []
-    for i in range(len(X_train)):
-        input_shapes.append(np.array(X_train[i]).shape[0])
+    for i in range(len(X)):
+        input_shapes.append(np.array(X[i]).shape[0])
     m.set_input_shapes(input_shapes)
-    for i in range(len(X_train)):
-        if X_train[i].shape[0] < max_num_atoms:
-            new_list = np.zeros([max_num_atoms - X_train[i].shape[0], n_features])
-            X_train[i] = np.concatenate([X_train[i], new_list], 0)
-    X_train = np.array(X_train)
-    y_train = np.array(y_train)
+    for i in range(len(X)):
+        if X[i].shape[0] < max_num_atoms:
+            new_list = np.zeros([max_num_atoms - X[i].shape[0], n_features])
+            X[i] = np.concatenate([X[i], new_list], 0)
+    X_train = np.array(X)
+    y_train = np.array(y)
     hist = m.fit(X_train, y_train, epochs=epochs, batch_size=len(X_train))
     return hist, m
 
