@@ -46,7 +46,7 @@ y_folds = [y[i*fold_size:(i + 1)*fold_size] for i in range(K)]
 
 hists = []
 test_loss = []
-for k in range(1):
+for k in range(K):
     print('Running fold %d' % k)
     X_train = []
     for i in range(K):
