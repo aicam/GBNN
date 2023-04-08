@@ -14,7 +14,7 @@ print('Data loaded')
 
 hists = []
 test_loss = []
-for k in range(1):
+for k in range(K):
     print('Running fold %d' % k)
     X_train = []
     for i in range(K):
