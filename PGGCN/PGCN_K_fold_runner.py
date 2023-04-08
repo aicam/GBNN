@@ -23,7 +23,7 @@ for k in range(K):
     X_test = X_folds[k]
     y_train = np.concatenate(np.array([y_folds[i] for i in range(K) if i != k]), 0)
     y_test = np.array(y_folds[k])
-    hist, m = get_trained_model(X_train, y_train, epochs=20)
+    hist, m = get_trained_model(X_train, y_train, epochs=25)
     hists.append(hist)
     test_loss.append(test_model(X_test, y_test, m))
 
