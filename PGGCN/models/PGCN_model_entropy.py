@@ -69,7 +69,7 @@ def get_trained_model(X, y, epochs = 1, max_num_atoms = 2000, n_features = 41):
     X_train = np.array(X)
     y_train = np.array(y)
     hist = m.fit(X_train, y_train, epochs=epochs, batch_size=len(X_train))
-    return hist, m
+    return hist.history['loss'], m
 
 def test_model(X_test, y_test, m: PGGCNModel, max_num_atoms = 2000, n_features = 41):
     input_shapes = []
