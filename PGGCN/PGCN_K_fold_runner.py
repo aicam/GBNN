@@ -7,14 +7,14 @@ PDBs = pickle.load(open('../Notebooks/Entropy/PDBs_RDKit.pkl', 'rb'))
 df = pd.read_csv('../Notebooks/Entropy/T_data.csv')
 
 K = 4
-X_folds = pickle.load(open('../Notebooks/Entropy/X_folds_4.pkl', 'rb'))
-y_folds = pickle.load(open('../Notebooks/Entropy/y_folds_4.pkl', 'rb'))
+X_folds = pickle.load(open('X_folds_4.pkl', 'rb'))
+y_folds = pickle.load(open('y_folds_4.pkl', 'rb'))
 
 print('Data loaded')
 
 hists = []
 test_loss = []
-for k in range(K):
+for k in range(1):
     print('Running fold %d' % k)
     X_train = []
     for i in range(K):
