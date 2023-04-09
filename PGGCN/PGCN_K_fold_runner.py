@@ -13,7 +13,6 @@ hists = []
 test_loss = []
 predicts_train = []
 predicts_test = []
-loss = []
 K = 4
 for k in range(K):
     X_train = []
@@ -32,7 +31,7 @@ for k in range(K):
     predicts_train.append(m.predict(x_converted, batch_size=len(X_train)))
     hists.append(hs)
     k_loss, x_converted = test_model(x_test_parsed, y_test, m)
-    loss.append(k_loss)
+    test_loss.append(k_loss)
     predicts_test.append(m.predict(x_converted, batch_size=len(X_test)))
 
 with open('PGCN_K_fold_hists.pkl', 'wb') as file:
