@@ -13,7 +13,6 @@ hists = []
 test_loss = []
 predicts_train = []
 predicts_test = []
-K = 4
 for k in range(K):
     X_train = []
     x_add_train = []
