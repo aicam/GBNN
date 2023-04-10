@@ -1,14 +1,11 @@
-import deepchem as dc
-import numpy as np
-from deepchem.feat.mol_graphs import ConvMol
 from deepchem.models.layers import GraphConv, GraphPool, GraphGather
 import keras.backend as K
 import tensorflow.keras.layers as layers
-from tensorflow.keras.layers import Dense, Input, BatchNormalization, Concatenate
 from tensorflow.keras import initializers
-import sys
 import tensorflow as tf
-import random
+from deepchem.feat.mol_graphs import ConvMol
+import numpy as np
+import deepchem as dc
 
 
 class GBGraphConvModel(tf.keras.Model):
@@ -38,9 +35,9 @@ class GBGraphConvModel(tf.keras.Model):
 
         ## Dense for overall
 
-        # self.dense4 = layers.Dense(1,
-        #  kernel_initializer=initializers.Constant([.5, -1, 1, 1]),
-        #  bias_initializer=initializers.Zeros())
+        self.dense4 = layers.Dense(1,
+         kernel_initializer=initializers.Constant([.5, -1, 1, 1]),
+         bias_initializer=initializers.Zeros(), activation=tf.keras.activations.relu)
 
     #     self.dense4 = layers.Dense(1,
     #          kernel_initializer=initializers.Constant([.5, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, 1]),
@@ -72,22 +69,24 @@ class GBGraphConvModel(tf.keras.Model):
 
         model_var = self.dense2(readout_output)
         model_var = self.dense3(model_var)
-        # binding_affinity = tf.concat([model_var, x_add], axis=1)
-        # ddg = self.dense4(binding_affinity)
+        binding_affinity = tf.concat([model_var, x_add], axis=1)
+        ddg = self.dense4(binding_affinity)
 
-        #     tf.print(self.dense4.weights, output_stream="file://weights.txt", summarize=30)
-        #     tf.print(binding_affinity[0], output_stream="file://binding_a.txt", summarize=30)
-        #     tf.print(ddg[0], output_stream="file://ddg.txt")
-        #     tf.print(model_var, output_stream="file://model_var.txt", summarize=30)
-        #     tf.print("-------------------------", output_stream=sys.stdout)
-        return model_var
+        return ddg
 
 def data_generator(PDBs, x_add):
     featurizer = dc.feat.ConvMolFeaturizer(per_atom_fragmentation=False)
     X = [featurizer.featurize(x)[0] for x in PDBs]
 
+    x_append = []
+    atom_numbers = [x.get_num_atoms() for x in X]
+    for i in range(len(X)):
+        for _ in range(atom_numbers[i]):
+            x_append.append(-x_add[i][0] + x_add[i][1] + x_add[i][2])
+    x_append = np.array(x_append).reshape([-1, 1])
+
     multiConvMol = ConvMol.agglomerate_mols(X)
-    x_preprocessed = [multiConvMol.get_atom_features(), multiConvMol.deg_slice, np.array(multiConvMol.membership)]
+    x_preprocessed = [np.concatenate([multiConvMol.get_atom_features(), x_append], 1), multiConvMol.deg_slice, np.array(multiConvMol.membership)]
     for i in range(1, len(multiConvMol.get_deg_adjacency_lists())):
         x_preprocessed.append(multiConvMol.get_deg_adjacency_lists()[i])
     x_preprocessed.append(np.array(x_add))
