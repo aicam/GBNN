@@ -14,7 +14,7 @@ class PGGCNModel(tf.keras.Model):
         super().__init__()
         self.ruleGraphConvLayer = layers.RuleGraphConvLayer(r_out_channel, num_atom_features, 0)
         self.ruleGraphConvLayer.combination_rules = []
-        self.conv = layers.ConvLayer(c_out_channel)
+        self.conv = layers.ConvLayer(c_out_channel, r_out_channel)
         self.dense1 = tf.keras.layers.Dense(64, activation='relu', name='dense1')
         self.dense5 = tf.keras.layers.Dense(16, name='relu')
         self.dense6 = tf.keras.layers.Dense(1, name='dense6')
