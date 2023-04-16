@@ -2,10 +2,10 @@ import numpy as np
 import pickle
 from models.PGCN_model_entropy import get_trained_model, test_model, data_generator
 
-K = 4
-PDBs_folds = pickle.load(open('PDBs_folds_4.pkl', 'rb'))
-y_folds = pickle.load(open('y_folds_4.pkl', 'rb'))
-x_add_folds = pickle.load(open('x_add_folds_4.pkl', 'rb'))
+K = 5
+PDBs_folds = pickle.load(open('PDBs_folds_%d.pkl' % K, 'rb'))
+y_folds = pickle.load(open('y_folds_%d.pkl' % K, 'rb'))
+x_add_folds = pickle.load(open('x_add_folds_%d.pkl' % K, 'rb'))
 
 print('Data loaded')
 
