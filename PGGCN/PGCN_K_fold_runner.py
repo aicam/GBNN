@@ -33,12 +33,12 @@ for k in range(K):
     test_loss.append(k_loss)
     predicts_test.append(m.predict(x_converted, batch_size=len(X_test)))
 
-with open('PGCN_PG_K%d_fold_hists.pkl' % K, 'wb') as file:
+with open('PGCN_DD_K%d_fold_hists.pkl' % K, 'wb') as file:
     pickle.dump(hists, file)
-with open('PGCN_PG_K%d_fold_test.pkl' % K, 'wb') as file:
+with open('PGCN_DD_K%d_fold_test.pkl' % K, 'wb') as file:
     pickle.dump(test_loss, file)
-with open('PGCN_PG_K%d_fold_train_pred.pkl' % K, 'wb') as file:
+with open('PGCN_DD_K%d_fold_train_pred.pkl' % K, 'wb') as file:
     pickle.dump(predicts_train, file)
-with open('PGCN_PG_K%d_fold_train_pred.pkl' % K, 'wb') as file:
+with open('PGCN_DD_K%d_fold_train_pred.pkl' % K, 'wb') as file:
     pickle.dump(predicts_train, file)
 print('finished')

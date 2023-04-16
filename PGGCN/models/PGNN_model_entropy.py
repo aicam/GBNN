@@ -38,9 +38,9 @@ class GBGraphConvModel(tf.keras.Model):
 
         ## Dense for overall
 
-        # self.dense4 = layers.Dense(1,
-        #  kernel_initializer=initializers.Constant([.5, -1, 1, 1]),
-        #  bias_initializer=initializers.Zeros())
+        self.dense4 = layers.Dense(1,
+         kernel_initializer=initializers.Constant([.5, -1, 1, 1]),
+         bias_initializer=initializers.Zeros())
 
     #     self.dense4 = layers.Dense(1,
     #          kernel_initializer=initializers.Constant([.5, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, -1, 1, 1]),
