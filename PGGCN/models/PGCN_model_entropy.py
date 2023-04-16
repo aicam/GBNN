@@ -10,7 +10,7 @@ importlib.reload(layers)
 
 
 class PGGCNModel(tf.keras.Model):
-    def __init__(self, num_atom_features=36, r_out_channel=20, c_out_channel=128):
+    def __init__(self, num_atom_features=36, r_out_channel=20, c_out_channel=1024):
         super().__init__()
         self.ruleGraphConvLayer = layers.RuleGraphConvLayer(r_out_channel, num_atom_features, 0)
         self.ruleGraphConvLayer.combination_rules = []
@@ -55,7 +55,7 @@ def get_trained_model(X, y, epochs = 1, max_num_atoms = 2000, n_features = 41):
     m.addRule("sum", 0, 31)
     m.addRule("multiply", 31, 33)
     m.addRule("distance", 33, 36)
-    opt = tf.keras.optimizers.Adam(learning_rate=0.001)
+    opt = tf.keras.optimizers.Adam(learning_rate=0.004)
     m.compile(loss=pure_rmse, optimizer=opt)
     X_train = X
     input_shapes = []
