@@ -143,7 +143,7 @@ class ConvLayer(tf.keras.Model):
         for feature in inp:
             feature = tf.reshape(feature, [1, -1])
             feature = tf.cast(feature, 'float')
-            out += tf.reshape(tf.nn.sigmoid(tf.matmul(feature, self.w)), [-1])
+            out += tf.reshape(tf.nn.softmax(tf.matmul(feature, self.w)), [-1])
         return tf.reshape(out, [-1])
 
     def call(self, inputs):
