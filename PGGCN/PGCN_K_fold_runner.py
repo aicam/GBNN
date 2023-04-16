@@ -26,7 +26,7 @@ for k in range(K):
     y_test = np.array(y_folds[k])
     x_train_parsed = data_generator(X_train, x_add_train)
     x_test_parsed = data_generator(X_test, x_add_test)
-    hs, m, x_converted = get_trained_model(x_train_parsed, np.array(y_train), epochs=40)
+    hs, m, x_converted = get_trained_model(x_train_parsed, np.array(y_train), epochs=60)
     predicts_train.append(m.predict(x_converted, batch_size=len(X_train)))
     hists.append(hs)
     k_loss, x_converted = test_model(x_test_parsed, y_test, m)
