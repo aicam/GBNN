@@ -55,7 +55,7 @@ def get_trained_model(X, y, epochs = 1, max_num_atoms = 2000, n_features = 41):
     m.addRule("sum", 0, 31)
     m.addRule("multiply", 31, 33)
     m.addRule("distance", 33, 36)
-    opt = tf.keras.optimizers.Adam(learning_rate=0.005)
+    opt = tf.keras.optimizers.Adam(learning_rate=0.001)
     m.compile(loss=pure_rmse, optimizer=opt)
     X_train = X
     input_shapes = []
