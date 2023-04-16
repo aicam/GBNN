@@ -10,13 +10,13 @@ importlib.reload(layers)
 
 
 class PGGCNModel(tf.keras.Model):
-    def __init__(self, num_atom_features=36, r_out_channel=20, c_out_channel=1024):
+    def __init__(self, num_atom_features=36, r_out_channel=20, c_out_channel=512):
         super().__init__()
         self.ruleGraphConvLayer = layers.RuleGraphConvLayer(r_out_channel, num_atom_features, 0)
         self.ruleGraphConvLayer.combination_rules = []
         self.conv = layers.ConvLayer(c_out_channel, r_out_channel)
-        self.dense1 = tf.keras.layers.Dense(32, activation='relu', name='dense1')
-        self.dense5 = tf.keras.layers.Dense(16, name='dense2', activation='relu')
+        self.dense1 = tf.keras.layers.Dense(64, activation='relu', name='dense1')
+        self.dense5 = tf.keras.layers.Dense(32, activation='relu', name='dense2')
         self.dense6 = tf.keras.layers.Dense(1, name='dense6')
         self.dense7 = tf.keras.layers.Dense(1, name='dense7',
                                             kernel_initializer=tf.keras.initializers.Constant([-.3, -1, 1, 1]),
@@ -55,7 +55,7 @@ def get_trained_model(X, y, epochs = 1, max_num_atoms = 2000, n_features = 41):
     m.addRule("sum", 0, 31)
     m.addRule("multiply", 31, 33)
     m.addRule("distance", 33, 36)
-    opt = tf.keras.optimizers.Adam(learning_rate=0.004)
+    opt = tf.keras.optimizers.Adam(learning_rate=0.003)
     m.compile(loss=pure_rmse, optimizer=opt)
     X_train = X
     input_shapes = []
