@@ -10,7 +10,7 @@ importlib.reload(layers)
 
 
 class PGGCNModel(tf.keras.Model):
-    def __init__(self, num_atom_features=36, r_out_channel=20, c_out_channel=256):
+    def __init__(self, num_atom_features=36, r_out_channel=25, c_out_channel=512):
         super().__init__()
         self.ruleGraphConvLayer = layers.RuleGraphConvLayer(r_out_channel, num_atom_features, 0)
         self.ruleGraphConvLayer.combination_rules = []
