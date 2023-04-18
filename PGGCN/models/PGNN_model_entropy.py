@@ -72,15 +72,15 @@ class GBGraphConvModel(tf.keras.Model):
 
         model_var = self.dense2(readout_output)
         model_var = self.dense3(model_var)
-        # binding_affinity = tf.concat([model_var, x_add], axis=1)
-        # ddg = self.dense4(binding_affinity)
+        binding_affinity = tf.concat([model_var, x_add], axis=1)
+        ddg = self.dense4(binding_affinity)
 
         #     tf.print(self.dense4.weights, output_stream="file://weights.txt", summarize=30)
         #     tf.print(binding_affinity[0], output_stream="file://binding_a.txt", summarize=30)
         #     tf.print(ddg[0], output_stream="file://ddg.txt")
         #     tf.print(model_var, output_stream="file://model_var.txt", summarize=30)
         #     tf.print("-------------------------", output_stream=sys.stdout)
-        return model_var
+        return ddg
 
 def data_generator(PDBs, x_add):
     featurizer = dc.feat.ConvMolFeaturizer(per_atom_fragmentation=False)
