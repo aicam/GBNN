@@ -27,7 +27,7 @@ for k in range(K):
     x_train_parsed = data_generator(X_train, x_add_train)
     x_test_parsed = data_generator(X_test, x_add_test)
     hs, m, x_converted = get_trained_model(x_train_parsed, np.array(y_train), epochs=40)
-    with open('PGCN_PG_K%d_W.pkl', 'wb') as f:
+    with open('PGCN_PG_K%d_W.pkl' % k, 'wb') as f:
         pickle.dump([m.layers[0].w_s, m.layers[0].w_n], f)
         f.close()
     predicts_train.append(m.predict(x_converted, batch_size=len(X_train)))
