@@ -24,7 +24,7 @@ group.add_argument('-cp', dest='complex_prmtop', metavar='<Topology File>',
 
 ## Extra
 group.add_argument('-is', dest='is_solvated', metavar='Bool',
-                  default=False, help='''Is the simulation run over a solvated structure?''')
+                  default=True, help='''Is the simulation run over a solvated structure?''')
 # group.add_argument('--only-gbnsr6', dest='only_gbnsr6', metavar='Bool',
 #                    default=False, help='''Running GBNSR6 only over the trajectory''')
 # group.add_argument('--only-mmpbsa', dest='only_mmpbsa', metavar='Bool',

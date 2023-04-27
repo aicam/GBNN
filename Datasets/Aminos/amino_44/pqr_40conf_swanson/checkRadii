@@ -1,0 +1,20 @@
+#! /bin/csh
+# Testing proteins with given rad file
+
+set pqrHome='/net/home/jswanson/param/ga/bbConf/blockedPqr/'
+set radHome='/net/home/jswanson/bin/pdb/' 
+set rads='ALL_FINAL' 
+
+#foreach res ('lys-beta1')
+foreach res ('lys-beta1' 'lys-beta2' 'lys-beta3' 'lys-beta4' 'lys-beta5' 'lys-beta6' 'lys-helix1' 'lys-helix2' 'lys-hairpin1' 'lys-hairpin2' 'cram-beta1' 'cram-beta2' 'cram-helix1' 'cram-helix2')
+
+
+    $radHome/assignBBradii.py -i $pqrHome/$res.pqr -o $res-BB.pqr -r $radHome/rads/$rads
+ 
+    $radHome/assignAllradii.py -i $pqrHome/$res.pqr -o $res-$rads.pqr -r $radHome/rads/$rads
+ 
+		$radHome/assign_PB_radii.py -r abt -i $pqrHome/$res.pqr -o $res-abt.pqr
+		echo $res >> pqrGen-out
+		echo `diff $res-$rads.pqr $res-abt.pqr` >> pqrGen-out
+
+end 
