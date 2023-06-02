@@ -22,7 +22,7 @@ PDBs = {}
 from os import listdir
 from os.path import isfile, join
 
-pdbs_path = '../Datasets/pdbbind_complex/'
+pdbs_path = '../Datasets/pdbbind_revisioned/'
 onlyfiles = [f for f in listdir(pdbs_path) if isfile(join(pdbs_path, f))]
 for f in onlyfiles:
     if f.split('.')[0] in complex_names_df:

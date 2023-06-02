@@ -12,10 +12,13 @@ dc.data.DiskDataset.from_numpy()
 from deepchem.feat import AtomicConvFeaturizer
 dc.models.KerasModel
 dc.feat.mol_graphs
+dc.models.GraphConvModel
 dc.models.KerasModel
 from deepchem.feat.graph_features import atom_features
 dc.models.layers.GraphConv
 dc.feat.ConvMolFeaturizer
+from deepchem.feat.mol_graphs import ConvMol
+ConvMol.agglomerate_mols()
 model = tf.keras.models.Sequential()
 model.add(MMLayer())
 model.add(GBLayer())
