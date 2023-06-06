@@ -15,6 +15,7 @@ dc.feat.mol_graphs
 dc.models.GraphConvModel
 dc.models.KerasModel
 from deepchem.feat.graph_features import atom_features
+dc.models.KerasModel
 dc.models.layers.GraphConv
 dc.feat.ConvMolFeaturizer
 from deepchem.feat.mol_graphs import ConvMol

@@ -4,7 +4,59 @@ import os
 import pandas as pd
 import rdkit
 from rdkit import Chem
+from deepchem.feat import MolecularFeaturizer
+from deepchem.feat.graph_features import one_of_k_encoding_unk
 
+
+class RuleGraphFeaturizer(MolecularFeaturizer):
+
+    def __init__(self):
+        self.dtype = object
+
+    def get_atom_feature(self, atom, conformer):
+
+        ## binary features
+        results = one_of_k_encoding_unk(
+            atom.GetSymbol(),
+            [
+                'C',
+                'N',
+                'O',
+                'S',
+                'F',
+                'Unknown'
+            ])
+        results += one_of_k_encoding_unk(atom.GetHybridization(), [
+            Chem.rdchem.HybridizationType.SP, Chem.rdchem.HybridizationType.SP2,
+            Chem.rdchem.HybridizationType.SP3, Chem.rdchem.HybridizationType.
+                                         SP3D, Chem.rdchem.HybridizationType.SP3D2
+        ])
+        results += atom.GetIsAromatic()
+
+        ## continuous features
+        results += atom.GetDegree()
+        results += atom.GetImplicitValence()
+        results += atom.GetNumRadicalElectrons()
+        results += atom.GetFormalCharge()
+        results += atom.GetTotalNumHs()
+        results += atom.GetMass()
+        results += atom.GetAtomicNum()
+
+        ## position
+        position = conformer.GetAtomPosition(atom.GetIdx())
+        results += [position.x, position.y, position.z]
+
+        ## bond type feature
+        bond_vec = [0, 0, 0, 0]
+        for bond in atom.GetBonds():
+            new_vec = one_of_k_encoding_unk(bond.GetBondType().name, ['SINGLE', 'DOUBLE', 'AROMATIC', 'Other'])
+            bond_vec[0] += new_vec[0]
+            bond_vec[1] += new_vec[1]
+            bond_vec[2] += new_vec[2]
+            bond_vec[3] += new_vec[3]
+        results += bond_vec
+
+        ## Overall 26 features
 class PGGCNFeaturizer:
     def __init__(self, mols_dict, physics_csv, atom_csvs_directory):
         self.mols_dict = mols_dict
