@@ -7,10 +7,13 @@ def run_gbnsr6(AMBERHOME, frame, prmtop, mdin, pre):
     store_frame_inpcrd(frame, fp=inpcrd)
     gbnsr6 = {}
     print(AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', prmtop, '-c', inpcrd, '-i', mdin)
-    res = subprocess.run(
-        [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', prmtop, '-c', inpcrd, '-i', mdin])
-    if res.returncode != 0:
-        exit(-12)
+    try:
+        res = subprocess.run(
+            [AMBERHOME + "/bin/gbnsr6", '-o', 'mdout', '-p', prmtop, '-c', inpcrd, '-i', mdin])
+    except :
+        print('Error happened in running', res)
+    # if res.returncode != 0:
+    #     exit(-12)
     new_res = read_gbnsr6_output('mdout')
     gbnsr6[pre + '_Etot'] = new_res['Etot']
     gbnsr6[pre + '_EKtot'] = new_res['EKtot']
