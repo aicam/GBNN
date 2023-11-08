@@ -1,19 +1,11 @@
-#ante-MMPBSA.py -p 0.15_80_10_pH7.5_6m0j_trunc_final.top -r ACE2_dry_trunc.prmtop -l SARS-CoV-2-spike_dry_trunc.prmtop -m :1-339
-# WARNING: -m is recepter residue number not atom number
 import pandas as pd
 import tensorflow as tf
 import numpy as np
-import os
-import conda_installer
-from rdkit import Chem
 from deepchem.feat.graph_features import atom_features as get_atom_features
-import rdkit
 import pickle
 import importlib
 import keras.backend as K
-from sklearn.utils import shuffle
 
-# %cd ../../PGGCN/
 import models.layers_update_mobley as layers
 importlib.reload(layers)
 from models.dcFeaturizer import atom_features as get_atom_features
