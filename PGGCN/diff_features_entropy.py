@@ -20,7 +20,7 @@ from models.dcFeaturizer import atom_features as get_atom_features
 # %cd ../Notebooks/Entropy
 PDBs = pickle.load(open('PDBs_RDKit.pkl', 'rb'))
 
-
+print(len(PDBs.keys()))
 def featurize(molecule, info, exclude=None):
     atom_features = []
     for atom in molecule.GetAtoms():
