@@ -55,7 +55,7 @@ class PGGCNModel(tf.keras.Model):
         self.i_s = i_s
 
     def call(self, inputs):
-        physics_info = inputs[:, 0, 38 - 1:]
+        physics_info = inputs[:, 0, 38 - 2:]
         x_a = []
         for i in range(len(self.i_s)):
             x_a.append(inputs[i][:self.i_s[i], :38 - 1])
