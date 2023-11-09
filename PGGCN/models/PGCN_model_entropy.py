@@ -19,7 +19,7 @@ class PGGCNModel(tf.keras.Model):
         self.dense5 = tf.keras.layers.Dense(16, activation='relu', name='dense2')
         self.dense6 = tf.keras.layers.Dense(1, name='dense6')
         self.dense7 = tf.keras.layers.Dense(1, name='dense7',
-                                            kernel_initializer=tf.keras.initializers.Constant([-.3, -1, 1, 1]),
+                                            kernel_initializer=tf.keras.initializers.Constant([-.3, 1, -1, -1]),
                                             bias_initializer=tf.keras.initializers.Zeros())
 
     def addRule(self, rule, start_index, end_index=None):
