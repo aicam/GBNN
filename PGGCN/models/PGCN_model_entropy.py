@@ -19,7 +19,7 @@ class PGGCNModel(tf.keras.Model):
         self.dense5 = tf.keras.layers.Dense(16, activation='relu', name='dense2')
         self.dense6 = tf.keras.layers.Dense(1, name='dense6')
         self.dense7 = tf.keras.layers.Dense(1, name='dense7',
-                                            kernel_initializer=tf.keras.initializers.Constant([-.3, 1, -1, -1]),
+                                            kernel_initializer=tf.keras.initializers.Constant([-.3, -1, 1, 1]),
                                             bias_initializer=tf.keras.initializers.Zeros())
 
     def addRule(self, rule, start_index, end_index=None):
@@ -52,8 +52,8 @@ def pure_rmse(y_true, y_pred):
 
 def get_trained_model(X, y, epochs = 1, max_num_atoms = 2000, n_features = 41):
     m = PGGCNModel()
-    m.addRule("sum", 0, 31)
-    m.addRule("multiply", 31, 33)
+    m.addRule("sum", 0, 32)
+    m.addRule("multiply", 32, 33)
     m.addRule("distance", 33, 36)
     opt = tf.keras.optimizers.Adam(learning_rate=0.005)
     m.compile(loss=pure_rmse, optimizer=opt)
@@ -92,13 +92,13 @@ def featurize(molecule, info):
     for atom in molecule.GetAtoms():
         new_feature = get_atom_features(atom).tolist()
         position = molecule.GetConformer().GetAtomPosition(atom.GetIdx())
-        new_feature += [atom.GetMass(), atom.GetAtomicNum()]
+        new_feature += [atom.GetMass(), atom.GetAtomicNum(), atom.GetFormalCharge()]
         new_feature += [position.x, position.y, position.z]
         for neighbor in atom.GetNeighbors()[:2]:
             neighbor_idx = neighbor.GetIdx()
             new_feature += [neighbor_idx]
         for i in range(2 - len(atom.GetNeighbors())):
-            new_feature += [-1]
+            new_feature += [0]
         atom_features.append(np.concatenate([new_feature, info], 0))
     return np.array(atom_features)
 def data_generator(PDBs, info):
