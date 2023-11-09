@@ -107,7 +107,7 @@ def train(X, y, excelude):
     m.set_input_shapes(input_shapes)
     for i in range(len(X_test)):
         if X_test[i].shape[0] < 2000:
-            new_list = np.zeros([2000 - X_test[i].shape[0], 40])
+            new_list = np.zeros([2000 - X_test[i].shape[0], 39])
             X_test[i] = np.concatenate([X_test[i], new_list], 0)
     X_test = np.array(X_test)
     y_test = np.array(y_test)
