@@ -58,7 +58,7 @@ class PGGCNModel(tf.keras.Model):
         physics_info = inputs[:, 0, 38 - 1:]
         x_a = []
         for i in range(len(self.i_s)):
-            x_a.append(inputs[i][:self.i_s[i], :38])
+            x_a.append(inputs[i][:self.i_s[i], :38 - 1])
         x = self.ruleGraphConvLayer(x_a)
         self.all_layer_1_weights.append(self.ruleGraphConvLayer.w_s)
         x = self.conv(x)
@@ -67,7 +67,7 @@ class PGGCNModel(tf.keras.Model):
         model_var = self.dense6(x)
         merged = tf.concat([model_var, physics_info], axis=1)
         out = self.dense7(merged)
-        return model_var
+        return out
 
 
 def root_mean_squared_error(y_true, y_pred):
