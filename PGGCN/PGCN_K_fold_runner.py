@@ -7,6 +7,7 @@ PDBs_folds = pickle.load(open('PDBs_folds_%d.pkl' % K, 'rb'))
 y_folds = pickle.load(open('y_folds_%d.pkl' % K, 'rb'))
 x_add_folds = pickle.load(open('x_add_folds_%d.pkl' % K, 'rb'))
 
+print(f"PDBs folds {'PDBs_folds_%d.pkl' % K}")
 print('Data loaded')
 
 hists = []
