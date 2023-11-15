@@ -20,9 +20,9 @@ for k in range(K):
     for i in range(K):
         if i != k:
             X_train += PDBs_folds[i]
-            x_add_train += x_add_folds[i]
+            x_add_train += [np.array(x) for x in x_add_folds[i]]
     X_test = PDBs_folds[k]
-    x_add_test = x_add_folds[i]
+    x_add_test = x_add_folds[k]
     y_train = np.concatenate(np.array([y_folds[i] for i in range(K) if i != k]), 0)
     y_test = np.array(y_folds[k])
     x_train_parsed = data_generator(X_train, x_add_train)
