@@ -18,9 +18,9 @@ class PGGCNModel(tf.keras.Model):
         self.dense1 = tf.keras.layers.Dense(32, activation='relu', name='dense1')
         self.dense5 = tf.keras.layers.Dense(16, activation='relu', name='dense2')
         self.dense6 = tf.keras.layers.Dense(1, name='dense6')
-        self.dense7 = tf.keras.layers.Dense(1, name='dense7',
-                                            kernel_initializer=tf.keras.initializers.Constant([-.3, -1, 1, 1]),
-                                            bias_initializer=tf.keras.initializers.Zeros())
+        # self.dense7 = tf.keras.layers.Dense(1, name='dense7',
+        #                                     kernel_initializer=tf.keras.initializers.Constant([-.3, -1, 1, 1]),
+        #                                     bias_initializer=tf.keras.initializers.Zeros())
 
     def addRule(self, rule, start_index, end_index=None):
         self.ruleGraphConvLayer.addRule(rule, start_index, end_index)
@@ -38,9 +38,9 @@ class PGGCNModel(tf.keras.Model):
         x = self.dense1(x)
         x = self.dense5(x)
         model_var = self.dense6(x)
-        merged = tf.concat([model_var, physics_info], axis=1)
-        out = self.dense7(merged)
-        return out
+        # merged = tf.concat([model_var, physics_info], axis=1)
+        # out = self.dense7(merged)
+        return model_var
 
 def root_mean_squared_error(y_true, y_pred):
     return K.sqrt(K.mean(K.square(y_pred[0] - y_true))) + K.abs(1 / K.mean(.2 + y_pred[1]))
