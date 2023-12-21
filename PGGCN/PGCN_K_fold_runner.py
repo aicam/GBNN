@@ -27,7 +27,7 @@ for k in range(K):
     y_test = np.array(y_folds[k])
     x_train_parsed = data_generator(X_train, x_add_train)
     x_test_parsed = data_generator(X_test, x_add_test)
-    hs, m, x_converted = get_trained_model(x_train_parsed, np.array(y_train), epochs=25)
+    hs, m, x_converted = get_trained_model(x_train_parsed, np.array(y_train), epochs=40)
     with open('PGCN_PG_K%d_W_n.pkl' % k, 'wb') as f:
         pickle.dump([m.layers[0].w_n, m.layers[0].w_n], f)
         f.close()
