@@ -43,4 +43,6 @@ with open('PGCN_PG_K%d_fold_test.pkl' % K, 'wb') as file:
     pickle.dump(test_loss, file)
 with open('PGCN_PG_K%d_fold_train_pred.pkl' % K, 'wb') as file:
     pickle.dump(predicts_train, file)
+with open('PGCN_PG_K%d_fold_test_pred.pkl' % K, 'wb') as file:
+    pickle.dump(predicts_test, file)
 print('finished')
