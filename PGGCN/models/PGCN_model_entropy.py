@@ -38,8 +38,8 @@ class PGGCNModel(tf.keras.Model):
         x = self.dense1(x)
         x = self.dense5(x)
         model_var = self.dense6(x)
-        # merged = tf.concat([model_var, physics_info], axis=1)
-        # out = self.dense7(merged)
+        merged = tf.concat([model_var, physics_info], axis=1)
+        out = self.dense7(merged)
         return model_var
 
 def root_mean_squared_error(y_true, y_pred):
