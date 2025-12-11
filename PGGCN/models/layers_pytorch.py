@@ -315,4 +315,6 @@ class PGGCNModel(nn.Module):
         # Final dense layer to combine model and physics predictions
         out = self.dense_final(merged)  # [batch_size, 1]
 
-        return out
+        # Return both final prediction and intermediate model_var for physics-informed loss
+        # Also return physics_info for loss calculation
+        return out, model_var, physics_info_tensor

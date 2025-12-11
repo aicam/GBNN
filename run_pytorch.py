@@ -37,6 +37,60 @@ from PGGCN.models.dcFeaturizer import atom_features as get_atom_features
 from PGGCN.models.layers_pytorch import PGGCNModel
 
 
+class PhysicsInformedLoss(nn.Module):
+    """
+    Custom loss function that combines MSE with a sign penalty.
+
+    The loss penalizes when model_var has a different sign than (pb_host_Etot - pb_guest_Etot).
+    This enforces physics-based constraints on the model's predictions.
+
+    Loss = MSE(prediction, target) + sign_penalty_weight * sign_loss
+    """
+
+    def __init__(self, sign_penalty_weight=1.0):
+        super(PhysicsInformedLoss, self).__init__()
+        self.sign_penalty_weight = sign_penalty_weight
+        self.mse = nn.MSELoss()
+
+    def forward(self, predictions, targets, model_vars, physics_info):
+        """
+        Args:
+            predictions: Final model predictions [batch_size, 1]
+            targets: Ground truth values [batch_size, 1]
+            model_vars: Model predictions before physics fusion [batch_size, 1]
+            physics_info: Physics-based info [batch_size, 2] where
+                         [:, 0] = pb_guest_Etot
+                         [:, 1] = pb_host_Etot
+
+        Returns:
+            Combined loss value
+        """
+        # Standard MSE loss
+        mse_loss = self.mse(predictions, targets)
+
+        # Calculate physics-based sign
+        # pb_host_Etot - pb_guest_Etot
+        physics_diff = physics_info[:, 1] - physics_info[:, 0]  # [batch_size]
+        physics_sign = torch.sign(physics_diff)  # [batch_size]
+
+        # Model prediction sign
+        model_sign = torch.sign(model_vars.squeeze(-1))  # [batch_size]
+
+        # Sign mismatch penalty
+        # If signs match: sign_product = 1 (positive)
+        # If signs mismatch: sign_product = -1 (negative)
+        sign_product = physics_sign * model_sign  # [batch_size]
+
+        # Penalize when sign_product < 0 (signs don't match)
+        # Use ReLU on negative sign_product to create penalty
+        sign_penalty = torch.mean(torch.relu(-sign_product))
+
+        # Combined loss
+        total_loss = mse_loss + self.sign_penalty_weight * sign_penalty
+
+        return total_loss, mse_loss, sign_penalty
+
+
 def featurize(molecule, info):
     """
     Featurize a molecule with additional info array.
@@ -175,9 +229,10 @@ def load_cd_set1_data(info_csv_path, pdb_dir):
     return X, y, df_cd_set1
 
 
-def train_model(model, X_train, y_train, X_val, y_val, epochs=100, lr=0.001, device='cpu'):
+def train_model(model, X_train, y_train, X_val, y_val, epochs=100, lr=0.001, device='cpu',
+                sign_penalty_weight=1.0):
     """
-    Train the PGGCN model.
+    Train the PGGCN model with physics-informed loss.
 
     Args:
         model: PGGCNModel instance
@@ -188,6 +243,7 @@ def train_model(model, X_train, y_train, X_val, y_val, epochs=100, lr=0.001, dev
         epochs: Number of training epochs
         lr: Learning rate
         device: Device to train on
+        sign_penalty_weight: Weight for sign penalty in loss function
 
     Returns:
         train_losses: List of training losses
@@ -195,10 +251,12 @@ def train_model(model, X_train, y_train, X_val, y_val, epochs=100, lr=0.001, dev
     """
     model = model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    criterion = nn.MSELoss()
+    criterion = PhysicsInformedLoss(sign_penalty_weight=sign_penalty_weight)
 
     train_losses = []
     val_losses = []
+    train_mse_losses = []
+    train_sign_penalties = []
 
     # Move data to device
     X_train = [x.to(device) for x in X_train]
@@ -209,6 +267,7 @@ def train_model(model, X_train, y_train, X_val, y_val, epochs=100, lr=0.001, dev
     print(f"\nTraining on {len(X_train)} samples, validating on {len(X_val)} samples")
     print(f"Device: {device}")
     print(f"Learning rate: {lr}")
+    print(f"Sign penalty weight: {sign_penalty_weight}")
     print(f"Epochs: {epochs}")
     print("=" * 80)
 
@@ -219,33 +278,40 @@ def train_model(model, X_train, y_train, X_val, y_val, epochs=100, lr=0.001, dev
         model.train()
         optimizer.zero_grad()
 
-        # Forward pass
-        predictions = model(X_train)
+        # Forward pass - now returns (predictions, model_var, physics_info)
+        predictions, model_var, physics_info = model(X_train)
 
-        # Compute loss
-        train_loss = criterion(predictions, y_train_tensor)
+        # Compute loss with physics-informed penalty
+        train_loss, train_mse, train_sign_penalty = criterion(
+            predictions, y_train_tensor, model_var, physics_info
+        )
 
         # Backward pass
         train_loss.backward()
         optimizer.step()
 
         train_losses.append(train_loss.item())
+        train_mse_losses.append(train_mse.item())
+        train_sign_penalties.append(train_sign_penalty.item())
 
         # Validation
         model.eval()
         with torch.no_grad():
-            val_predictions = model(X_val)
-            val_loss = criterion(val_predictions, y_val_tensor)
+            val_predictions, val_model_var, val_physics_info = model(X_val)
+            val_loss, val_mse, val_sign_penalty = criterion(
+                val_predictions, y_val_tensor, val_model_var, val_physics_info
+            )
             val_losses.append(val_loss.item())
 
-            # Calculate RMSE
-            train_rmse = torch.sqrt(train_loss).item()
-            val_rmse = torch.sqrt(val_loss).item()
+            # Calculate RMSE (from MSE component only)
+            train_rmse = torch.sqrt(train_mse).item()
+            val_rmse = torch.sqrt(val_mse).item()
 
         # Print progress
         if (epoch + 1) % 10 == 0 or epoch == 0:
             print(f"Epoch {epoch+1:3d}/{epochs} | "
-                  f"Train Loss: {train_loss.item():.4f} (RMSE: {train_rmse:.4f}) | "
+                  f"Train Loss: {train_loss.item():.4f} (MSE: {train_mse.item():.4f}, "
+                  f"Sign: {train_sign_penalty.item():.4f}) | "
                   f"Val Loss: {val_loss.item():.4f} (RMSE: {val_rmse:.4f})")
 
         # Save best model
@@ -254,7 +320,7 @@ def train_model(model, X_train, y_train, X_val, y_val, epochs=100, lr=0.001, dev
             best_epoch = epoch + 1
 
     print("=" * 80)
-    print(f"Best validation loss: {best_val_loss:.4f} (RMSE: {np.sqrt(best_val_loss):.4f}) at epoch {best_epoch}")
+    print(f"Best validation loss: {best_val_loss:.4f} at epoch {best_epoch}")
 
     return train_losses, val_losses
 
@@ -280,7 +346,7 @@ def evaluate_model(model, X_test, y_test, device='cpu'):
     y_test_tensor = torch.FloatTensor(y_test).unsqueeze(1).to(device)
 
     with torch.no_grad():
-        predictions = model(X_test)
+        predictions, model_var, physics_info = model(X_test)
 
         # Calculate metrics
         mse = nn.MSELoss()(predictions, y_test_tensor).item()
@@ -292,11 +358,19 @@ def evaluate_model(model, X_test, y_test, device='cpu'):
         ss_tot = torch.sum((y_test_tensor - torch.mean(y_test_tensor)) ** 2).item()
         r2 = 1 - (ss_res / ss_tot)
 
+        # Calculate sign accuracy
+        physics_diff = physics_info[:, 1] - physics_info[:, 0]
+        physics_sign = torch.sign(physics_diff)
+        model_sign = torch.sign(model_var.squeeze(-1))
+        sign_matches = (physics_sign == model_sign).float()
+        sign_accuracy = torch.mean(sign_matches).item()
+
     metrics = {
         'mse': mse,
         'rmse': rmse,
         'mae': mae,
-        'r2': r2
+        'r2': r2,
+        'sign_accuracy': sign_accuracy
     }
 
     return predictions.cpu().numpy(), metrics
@@ -360,11 +434,16 @@ def main():
     print("\n" + "-" * 80)
     print("Training Model")
     print("-" * 80)
+
+    # Sign penalty weight: higher values enforce stronger sign matching
+    sign_penalty_weight = 1.0
+
     train_losses, val_losses = train_model(
         model, X_train, y_train, X_test, y_test,
         epochs=200,
         lr=0.001,
-        device=device
+        device=device,
+        sign_penalty_weight=sign_penalty_weight
     )
 
     # Evaluate on test set
@@ -378,6 +457,7 @@ def main():
     print(f"  RMSE: {metrics['rmse']:.4f}")
     print(f"  MAE:  {metrics['mae']:.4f}")
     print(f"  R²:   {metrics['r2']:.4f}")
+    print(f"  Sign Accuracy: {metrics['sign_accuracy']*100:.1f}%")
 
     # Show some predictions
     print("\n" + "-" * 80)
